@@ -1,6 +1,8 @@
 package com.fluffb4ll.gameserver.model;
 
 import com.fluffb4ll.gameserver.engine.MovementValidator;
+import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
+import com.fluffb4ll.gameserver.util.AtomicFloat;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,17 +11,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Defines a living entity, which can move and inflict and receive damage.
  */
 public class LivingEntity extends BaseEntity {
-    private volatile AtomicInteger maxHealth;
+    private AtomicInteger maxHealth;
     private AtomicInteger health;
-    private volatile AtomicInteger damage;
-    private volatile float speed;
+    private AtomicInteger damage;
+    private AtomicFloat speed;
+    private final EventBus eventBus;
 
-    public LivingEntity(UUID uuid, AtomicInteger maxHealth, AtomicInteger damage) {
+    public LivingEntity(UUID uuid, AtomicInteger maxHealth, AtomicInteger damage, EventBus eventBus) {
         super(uuid);
 
-        health = maxHealth;
-        this.maxHealth = maxHealth;
-        this.damage = damage;
+        health = new AtomicInteger(maxHealth.get());
+        this.maxHealth.set(maxHealth.get());
+        this.damage.set(damage.get());
+
+        this.eventBus = eventBus;
     }
 
     public int getDamage() {
@@ -30,7 +35,7 @@ public class LivingEntity extends BaseEntity {
         return health.get();
     }
 
-    public float getSpeed() {
+    public AtomicFloat getSpeed() {
         return speed;
     }
 
@@ -46,7 +51,7 @@ public class LivingEntity extends BaseEntity {
         this.damage.set(damage);
     }
 
-    protected void setSpeed(float speed) {
+    protected void setSpeed(AtomicFloat speed) {
         this.speed = speed;
     }
 
@@ -54,7 +59,8 @@ public class LivingEntity extends BaseEntity {
         this.maxHealth.set(maxHealth);
     }
 
-    public boolean move(Vector2D newPos) {
+    // TODO: переписать движение
+    public synchronized boolean move(Vector2D newPos) {
         if (MovementValidator.isValidMove(getPosition(), newPos)) {
             setPosition(newPos);
             return true;
@@ -62,22 +68,18 @@ public class LivingEntity extends BaseEntity {
         return false;
     }
 
-    public void takeDamage(int damage) {
+    public synchronized void takeDamage(int damage) {
         int hp = health.addAndGet(-damage);
         if (hp > 0)
             return;
         this.health.set(0);
-        onDeath();
+        eventBus.publish(new EntityDeathEvent(getUuid()));
     }
 
-    public void heal(int healAmount) {
+    public synchronized void heal(int healAmount) {
         int hp = health.addAndGet(healAmount);
         int maxHealth = this.maxHealth.get();
         if (hp > maxHealth)
             health.set(maxHealth);
-    }
-
-    private void onDeath() {
-
     }
 }
