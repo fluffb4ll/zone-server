@@ -1,0 +1,91 @@
+package com.fluffb4ll.gameserver.model;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+/**
+ * Представляет собой независимую область игрового мира,
+ * используемую для оптимизации рендеринга и работы с памятью.
+ */
+public class MapChunk {
+    private final UUID id;
+
+    private final Vector2D startPoint;
+    private final Vector2D endPoint;
+
+    private final Set<Player> players;
+    private final Set<Anomaly> anomalies;
+    private final Set<Mutant> mutants;
+
+    public MapChunk(UUID id, Vector2D start, Vector2D end) {
+        this.id = id;
+        startPoint = start;
+        endPoint = end;
+
+        players = ConcurrentHashMap.newKeySet();
+        anomalies = ConcurrentHashMap.newKeySet();
+        mutants = ConcurrentHashMap.newKeySet();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Vector2D getStartPoint() {
+        return startPoint;
+    }
+
+    public Vector2D getEndPoint() {
+        return endPoint;
+    }
+
+    public Set<Player> getPlayers() {
+        return Collections.unmodifiableSet(players);
+    }
+
+    public Set<Anomaly> getAnomalies() {
+        return Collections.unmodifiableSet(anomalies);
+    }
+
+    public Set<Mutant> getMutants() {
+        return Collections.unmodifiableSet(mutants);
+    }
+
+    public Stream<BaseEntity> getAllEntitiesStream() {
+        return Stream.concat(players.stream(),
+                Stream.concat(mutants.stream(), anomalies.stream())
+        );
+    }
+
+    public boolean addPlayer(Player player) {
+        return players.add(player);
+    }
+
+    public boolean addAnomaly(Anomaly anomaly) {
+        return anomalies.add(anomaly);
+    }
+
+    public boolean addMutant(Mutant mutant) {
+        return mutants.add(mutant);
+    }
+
+    public boolean removePlayer(Player player) {
+        return players.remove(player);
+    }
+
+    public boolean removeAnomaly(Anomaly anomaly) {
+        return anomalies.remove(anomaly);
+    }
+
+    public boolean removeMutant(Mutant mutant) {
+        return mutants.remove(mutant);
+    }
+
+    public boolean contains(Vector2D pos) {
+        return pos.x >= startPoint.x && pos.x < endPoint.x &&
+                pos.y >= startPoint.y && pos.y < endPoint.y;
+    }
+}
