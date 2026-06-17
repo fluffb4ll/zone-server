@@ -62,11 +62,10 @@ public abstract class LivingEntity extends BaseEntity {
 
     // TODO: переписать движение
     public synchronized boolean move(Vector2D newPos) {
-        if (MovementValidator.isValidMove(getPosition(), newPos)) {
-            setPosition(newPos);
-            return true;
-        }
-        return false;
+        if (!MovementValidator.isValidMove(getPosition(), newPos))
+            return false;
+        setPosition(newPos);
+        return true;
     }
 
     public synchronized void takeDamage(int damage) {
