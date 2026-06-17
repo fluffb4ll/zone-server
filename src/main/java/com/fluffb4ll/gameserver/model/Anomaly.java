@@ -9,17 +9,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Anomaly extends LivingEntity {
     private final AnomalyType type;
     private final AtomicFloat radius;
+    private final boolean isStatic;
 
     public Anomaly(UUID uuid,
                    AtomicInteger maxHealth,
                    AtomicInteger damage,
                    EventBus eventBus,
                    AnomalyType type,
-                   AtomicFloat radius) {
+                   AtomicFloat radius,
+                   boolean isStatic) {
         super(uuid, maxHealth, damage, eventBus);
 
         this.type = type;
         this.radius = new AtomicFloat(radius.get());
+        this.isStatic = isStatic;
     }
 
 
@@ -29,5 +32,9 @@ public class Anomaly extends LivingEntity {
 
     public AtomicFloat getRadius() {
         return radius;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
     }
 }

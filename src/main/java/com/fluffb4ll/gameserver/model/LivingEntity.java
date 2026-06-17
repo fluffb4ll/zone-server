@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Defines a living entity, which can move and inflict and receive damage.
  */
-public class LivingEntity extends BaseEntity {
+public abstract class LivingEntity extends BaseEntity {
     private AtomicInteger maxHealth;
     private AtomicInteger health;
     private AtomicInteger damage;
