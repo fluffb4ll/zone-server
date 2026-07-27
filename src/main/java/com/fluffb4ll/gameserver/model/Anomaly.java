@@ -30,8 +30,8 @@ public class Anomaly extends LivingEntity {
         return type;
     }
 
-    public AtomicFloat getRadius() {
-        return radius;
+    public float getRadius() {
+        return radius.floatValue();
     }
 
     public boolean isStatic() {

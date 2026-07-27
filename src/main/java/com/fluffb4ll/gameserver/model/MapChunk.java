@@ -1,9 +1,12 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.model.enums.ChunkState;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -20,7 +23,9 @@ public class MapChunk {
     private final Set<Anomaly> anomalies;
     private final Set<Mutant> mutants;
 
-    public MapChunk(UUID id, Vector2D start, Vector2D end) {
+    private ChunkState chunkState;
+
+    public MapChunk(UUID id, Vector2D start, Vector2D end, ChunkState chunkState) {
         this.id = id;
         startPoint = start;
         endPoint = end;
@@ -28,6 +33,8 @@ public class MapChunk {
         players = ConcurrentHashMap.newKeySet();
         anomalies = ConcurrentHashMap.newKeySet();
         mutants = ConcurrentHashMap.newKeySet();
+
+        this.chunkState = chunkState;
     }
 
     public UUID getId() {
@@ -60,6 +67,10 @@ public class MapChunk {
         );
     }
 
+    public ChunkState getState() {
+        return chunkState;
+    }
+
     public boolean addPlayer(Player player) {
         return players.add(player);
     }
@@ -82,6 +93,10 @@ public class MapChunk {
 
     public boolean removeMutant(Mutant mutant) {
         return mutants.remove(mutant);
+    }
+
+    public synchronized void setState(ChunkState chunkState) {
+        this.chunkState = chunkState;
     }
 
     public boolean contains(Vector2D pos) {

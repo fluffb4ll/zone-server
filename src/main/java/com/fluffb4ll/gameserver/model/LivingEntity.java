@@ -36,8 +36,8 @@ public abstract class LivingEntity extends BaseEntity {
         return health.get();
     }
 
-    public AtomicFloat getSpeed() {
-        return speed;
+    public float getSpeed() {
+        return speed.floatValue();
     }
 
     public int getMaxHealth() {

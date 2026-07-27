@@ -1,5 +1,6 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WorldManager {
     private final Map<ChunkCoordinate, MapChunk> chunks = new ConcurrentHashMap<>();
 
-    // TODO: вынести в application.properties?
+    // TODO: вынести в отдельный конфиг
     // размер чанка в юнитах
     private static final int CHUNK_SIZE = 100;
 
@@ -34,7 +35,8 @@ public class WorldManager {
 
                 ChunkCoordinate coordinate = new ChunkCoordinate(cx, cy);
 
-                MapChunk chunk = new MapChunk(UUID.randomUUID(), startPoint, endPoint);
+                // TODO: парсить тикрейт из конфига
+                MapChunk chunk = new MapChunk(UUID.randomUUID(), startPoint, endPoint, ChunkState.ACTIVE);
 
                 chunks.put(coordinate, chunk);
             }
