@@ -146,21 +146,12 @@ public class MapChunk {
             return;
         }
 
-        if (isColliding(entity, anomaly))
+        if (anomaly.isColliding(entity))
             anomaly.addTarget(entity);
         else
             anomaly.removeTarget(entity);
     }
-
-    private boolean isColliding(LivingEntity entity, Anomaly anomaly) {
-        float dx = entity.getPosition().x - anomaly.getPosition().x;
-        float dy = entity.getPosition().y - anomaly.getPosition().y;
-        float distSquared = dx * dx + dy * dy;
-
-        float radius = anomaly.getRadius();
-        return distSquared <= radius * radius;
-    }
-
+    
     private void cleanUpDeadEntities() {
         mutants.removeIf(mutant -> !mutant.isAlive());
     }

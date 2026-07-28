@@ -10,8 +10,9 @@ public abstract class BaseEntity {
     private final UUID id;
     private volatile Vector2D position;
 
-    public BaseEntity(UUID id) {
+    public BaseEntity(UUID id, Vector2D position) {
         this.id = id;
+        this.position = position;
     }
 
     public Vector2D getPosition() {

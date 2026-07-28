@@ -24,16 +24,17 @@ public class Anomaly extends LivingEntity {
     private static final float CHARGE_TIME = 0.5f;
 
     public Anomaly(UUID uuid,
-                   AtomicInteger maxHealth,
-                   AtomicInteger damage,
+                   Vector2D position,
+                   int maxHealth,
+                   int damage,
                    EventBus eventBus,
                    AnomalyType type,
-                   AtomicFloat radius,
+                   float radius,
                    boolean isStatic) {
-        super(uuid, maxHealth, damage, eventBus);
+        super(uuid, position, maxHealth, damage, eventBus);
 
         this.type = type;
-        this.radius = new AtomicFloat(radius.get());
+        this.radius = new AtomicFloat(radius);
         this.isStatic = isStatic;
 
         this.state = AnomalyState.IDLE;
@@ -91,11 +92,20 @@ public class Anomaly extends LivingEntity {
         }
     }
 
-    public void burst() {
+    private void burst() {
         for (LivingEntity target : targetsInRange)
             target.takeDamage(getDamage());
 
         state = AnomalyState.COOLDOWN;
         timer = COOLDOWN_TIME;
+    }
+
+    public boolean isColliding(LivingEntity entity) {
+        float dx = entity.getPosition().x - getPosition().x;
+        float dy = entity.getPosition().y - getPosition().y;
+        float distSquared = dx * dx + dy * dy;
+
+        float radius = getRadius();
+        return distSquared <= radius * radius;
     }
 }

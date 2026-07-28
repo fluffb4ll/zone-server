@@ -23,17 +23,19 @@ public class Mutant extends LivingEntity {
     private float timer = 0f;
 
     public Mutant(UUID uuid,
-                  AtomicInteger maxHealth,
-                  AtomicInteger damage,
+                  Vector2D position,
+                  int maxHealth,
+                  int damage,
                   EventBus eventBus,
                   String species,
-                  MutantBehaviour behaviour, Vector2D homePosition) {
-        super(uuid, maxHealth, damage, eventBus);
+                  MutantBehaviour behaviour) {
+        super(uuid, position, maxHealth, damage, eventBus);
 
         this.species = species;
         this.behaviour = behaviour;
 
-        this.homePosition = homePosition;
+        this.homePosition = position;
+        this.setPosition(generateRandomWanderPoint());
         timer = 1f + RAND.nextFloat() * 2f;
     }
 

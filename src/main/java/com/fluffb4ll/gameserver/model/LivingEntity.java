@@ -17,12 +17,12 @@ public abstract class LivingEntity extends BaseEntity {
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(UUID uuid, AtomicInteger maxHealth, AtomicInteger damage, EventBus eventBus) {
-        super(uuid);
+    public LivingEntity(UUID uuid, Vector2D position, int maxHealth, int damage, EventBus eventBus) {
+        super(uuid, position);
 
-        health = new AtomicInteger(maxHealth.get());
-        this.maxHealth = new AtomicInteger(maxHealth.get());
-        this.damage = new AtomicInteger(damage.get());
+        health = new AtomicInteger(maxHealth);
+        this.maxHealth = new AtomicInteger(maxHealth);
+        this.damage = new AtomicInteger(damage);
         speed = new AtomicFloat();
 
         this.eventBus = eventBus;

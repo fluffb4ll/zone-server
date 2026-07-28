@@ -9,8 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Player extends LivingEntity {
     private volatile String nickname;
 
-    public Player(UUID uuid, String nickname, AtomicInteger maxHealth, AtomicInteger damage, EventBus eventBus) {
-        super(uuid, maxHealth, damage, eventBus);
+    public Player(UUID uuid, Vector2D position, String nickname, int maxHealth, int damage, EventBus eventBus) {
+        super(uuid, position, maxHealth, damage, eventBus);
         this.nickname = nickname;
     }
 
