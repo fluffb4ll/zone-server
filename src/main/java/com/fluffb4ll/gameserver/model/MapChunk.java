@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -123,7 +122,13 @@ public class MapChunk {
     }
 
     private void tickMutants(float deltaTime, WorldManager worldManager) {
-        return;
+        for (Mutant mutant : mutants) {
+            if (!mutant.isAlive())
+                continue;
+            mutant.updateAI(deltaTime);
+            Vector2D newPos = mutant.calculateNextPosition(deltaTime);
+            worldManager.moveEntity(mutant, this, newPos);
+        }
     }
 
     private void resolveCollisions() {
@@ -157,6 +162,6 @@ public class MapChunk {
     }
 
     private void cleanUpDeadEntities() {
-        return;
+        mutants.removeIf(mutant -> !mutant.isAlive());
     }
 }
