@@ -5,6 +5,8 @@ import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +50,10 @@ public class WorldManager {
 
     public MapChunk getChunk(ChunkCoordinate coordinate) {
         return chunks.get(coordinate);
+    }
+
+    public List<MapChunk> getAllChunks() {
+        return new ArrayList<>(chunks.values());
     }
 
     public MapChunk getChunkByPosition(Vector2D pos) {
@@ -101,5 +107,10 @@ public class WorldManager {
     private void handleOutOfBoundsTravel(LivingEntity entity) {
         // TODO: добавить обработку выхода за границы карты
         System.out.println("Сущность " + entity.getUuid() + " попыталась выйти за пределы карты!");
+    }
+
+    // TODO: изменять лоды чанков в зависимости от близости игроков
+    public void updateChunkLODs() throws Exception {
+        return;
     }
 }

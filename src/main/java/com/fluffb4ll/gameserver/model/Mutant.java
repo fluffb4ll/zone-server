@@ -1,6 +1,7 @@
 package com.fluffb4ll.gameserver.model;
 
 import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
+import com.fluffb4ll.gameserver.model.enums.MutantState;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,6 +10,7 @@ public class Mutant extends LivingEntity {
     private final String species;
     private MutantBehaviour behaviour;
 
+    private MutantState state;
 
     public Mutant(UUID uuid,
                   AtomicInteger maxHealth,
@@ -32,5 +34,13 @@ public class Mutant extends LivingEntity {
 
     public String getSpecies() {
         return species;
+    }
+
+    public MutantState getState() {
+        return state;
+    }
+
+    public synchronized void setState(MutantState state) {
+        this.state = state;
     }
 }

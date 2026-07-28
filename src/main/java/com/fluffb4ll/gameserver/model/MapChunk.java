@@ -103,4 +103,27 @@ public class MapChunk {
         return pos.x >= startPoint.x && pos.x < endPoint.x &&
                 pos.y >= startPoint.y && pos.y < endPoint.y;
     }
+
+    public void tick(long tickCount) {
+        tickAnomalies();
+        tickMutants();
+        resolveCollisions();
+        cleanUpDeadEntities();
+    }
+
+    private void tickAnomalies() {
+        return;
+    }
+
+    private void tickMutants() {
+        return;
+    }
+
+    private void resolveCollisions() {
+        return;
+    }
+
+    private void cleanUpDeadEntities() {
+        return;
+    }
 }

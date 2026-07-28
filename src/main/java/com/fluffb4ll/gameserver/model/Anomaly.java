@@ -1,5 +1,6 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.model.enums.AnomalyState;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
 
@@ -10,6 +11,8 @@ public class Anomaly extends LivingEntity {
     private final AnomalyType type;
     private final AtomicFloat radius;
     private final boolean isStatic;
+
+    private AnomalyState state;
 
     public Anomaly(UUID uuid,
                    AtomicInteger maxHealth,
@@ -23,6 +26,8 @@ public class Anomaly extends LivingEntity {
         this.type = type;
         this.radius = new AtomicFloat(radius.get());
         this.isStatic = isStatic;
+
+        this.state = AnomalyState.IDLE;
     }
 
 
@@ -34,7 +39,15 @@ public class Anomaly extends LivingEntity {
         return radius.floatValue();
     }
 
+    public AnomalyState getState() {
+        return state;
+    }
+
     public boolean isStatic() {
         return isStatic;
+    }
+
+    public synchronized void setState(AnomalyState state) {
+        this.state = state;
     }
 }
