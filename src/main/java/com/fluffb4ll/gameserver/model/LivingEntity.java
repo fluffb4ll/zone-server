@@ -37,11 +37,15 @@ public abstract class LivingEntity extends BaseEntity {
     }
 
     public float getSpeed() {
-        return speed.floatValue();
+        return speed.get();
     }
 
     public int getMaxHealth() {
         return maxHealth.get();
+    }
+
+    public boolean isAlive() {
+        return health.get() > 0;
     }
 
     protected void setHealth(int health) {

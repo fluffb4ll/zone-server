@@ -40,7 +40,7 @@ public class GameLoop {
 
             worldManager.getAllChunks().forEach(chunk -> {
                 if (shouldTickChunk(chunk))
-                    chunkWorkerPool.submit(() -> {chunk.tick(tickCount);});
+                    chunkWorkerPool.submit(() -> {chunk.tick(tickCount, 1f / TICK_RATE, worldManager);});
             });
 
         } catch (Exception e) {

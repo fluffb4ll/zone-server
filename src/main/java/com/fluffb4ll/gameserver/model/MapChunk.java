@@ -104,23 +104,56 @@ public class MapChunk {
                 pos.y >= startPoint.y && pos.y < endPoint.y;
     }
 
-    public void tick(long tickCount) {
-        tickAnomalies();
-        tickMutants();
+    /**
+     * Обработчик состояния чанка за один тик
+     * @param tickCount число тиков, прошедших со старта сервера
+     * @param deltaTime время в секундах, прошедшее с прошлого тика
+     * @param worldManager менеджер мира, используется для миграции сущностей
+     */
+    public void tick(long tickCount, float deltaTime, WorldManager worldManager) {
+        tickAnomalies(deltaTime);
+        tickMutants(deltaTime, worldManager);
         resolveCollisions();
         cleanUpDeadEntities();
     }
 
-    private void tickAnomalies() {
-        return;
+    private void tickAnomalies(float deltaTime) {
+        for (Anomaly anomaly : anomalies)
+            anomaly.update(deltaTime);
     }
 
-    private void tickMutants() {
+    private void tickMutants(float deltaTime, WorldManager worldManager) {
         return;
     }
 
     private void resolveCollisions() {
-        return;
+        for (Anomaly anomaly : anomalies) {
+            for (Player player : players)
+                checkEntityAnomalyCollision(player, anomaly);
+            for (Mutant mutant : mutants)
+                checkEntityAnomalyCollision(mutant, anomaly);
+        }
+    }
+
+    private void checkEntityAnomalyCollision(LivingEntity entity, Anomaly anomaly) {
+        if (!entity.isAlive()) {
+            anomaly.removeTarget(entity);
+            return;
+        }
+
+        if (isColliding(entity, anomaly))
+            anomaly.addTarget(entity);
+        else
+            anomaly.removeTarget(entity);
+    }
+
+    private boolean isColliding(LivingEntity entity, Anomaly anomaly) {
+        float dx = entity.getPosition().x - anomaly.getPosition().x;
+        float dy = entity.getPosition().y - anomaly.getPosition().y;
+        float distSquared = dx * dx + dy * dy;
+
+        float radius = anomaly.getRadius();
+        return distSquared <= radius * radius;
     }
 
     private void cleanUpDeadEntities() {
