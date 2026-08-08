@@ -38,7 +38,6 @@ public class GameLoop {
         this.worldManager = worldManager;
     }
 
-    @PostConstruct
     public void start() {
         heartbeat.scheduleAtFixedRate(this::mainTick, 0, 1000 / TICK_RATE, TimeUnit.MILLISECONDS);
         System.out.format("[GameLoop]: Запуск Game Loop на %d TPS%n", TICK_RATE);
