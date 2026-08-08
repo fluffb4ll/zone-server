@@ -1,6 +1,8 @@
 package com.fluffb4ll.gameserver.model;
 
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
+import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
+import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.Collections;
 import java.util.Set;
@@ -24,8 +26,8 @@ public class MapChunk {
 
     private ChunkState chunkState;
 
-    public MapChunk(UUID id, Vector2D start, Vector2D end, ChunkState chunkState) {
-        this.id = id;
+    public MapChunk(Vector2D start, Vector2D end, ChunkState chunkState) {
+        this.id = UUID.randomUUID();
         startPoint = start;
         endPoint = end;
 
@@ -110,6 +112,8 @@ public class MapChunk {
      * @param worldManager менеджер мира, используется для миграции сущностей
      */
     public void tick(long tickCount, float deltaTime, WorldManager worldManager) {
+        if (!anomalies.isEmpty() || !mutants.isEmpty())
+            WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y), mutants.size(), anomalies.size());
         tickAnomalies(deltaTime);
         tickMutants(deltaTime, worldManager);
         resolveCollisions();
@@ -151,7 +155,7 @@ public class MapChunk {
         else
             anomaly.removeTarget(entity);
     }
-    
+
     private void cleanUpDeadEntities() {
         mutants.removeIf(mutant -> !mutant.isAlive());
     }

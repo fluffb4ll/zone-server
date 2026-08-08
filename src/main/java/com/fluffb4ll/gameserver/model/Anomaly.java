@@ -1,13 +1,14 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.model.enums.AnomalyState;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
+import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Anomaly extends LivingEntity {
     private final AnomalyType type;
@@ -23,15 +24,15 @@ public class Anomaly extends LivingEntity {
     private static final float COOLDOWN_TIME = 3f;
     private static final float CHARGE_TIME = 0.5f;
 
-    public Anomaly(UUID uuid,
-                   Vector2D position,
+    public Anomaly(Vector2D position,
                    int maxHealth,
                    int damage,
+                   float speed,
                    EventBus eventBus,
                    AnomalyType type,
                    float radius,
                    boolean isStatic) {
-        super(uuid, position, maxHealth, damage, eventBus);
+        super(position, maxHealth, damage, speed, eventBus);
 
         this.type = type;
         this.radius = new AtomicFloat(radius);
@@ -93,8 +94,10 @@ public class Anomaly extends LivingEntity {
     }
 
     private void burst() {
-        for (LivingEntity target : targetsInRange)
+        for (LivingEntity target : targetsInRange) {
             target.takeDamage(getDamage());
+            WorldLogger.logAnomalyHit(target.getUuid().toString(), type.toString(), target.getHealth());
+        }
 
         state = AnomalyState.COOLDOWN;
         timer = COOLDOWN_TIME;

@@ -1,4 +1,6 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.engine;
+
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.function.Consumer;
 /**
  * Decentralized event handler
  */
+@Service
 public class EventBus {
     private final Map<Class<?>, List<Consumer<?>>> listeners = new ConcurrentHashMap<>();
 

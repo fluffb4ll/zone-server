@@ -1,11 +1,11 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
 import com.fluffb4ll.gameserver.model.enums.MutantState;
 
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Mutant extends LivingEntity {
     private static final Random RAND = new Random();
@@ -13,23 +13,23 @@ public class Mutant extends LivingEntity {
     private final String species;
     private MutantBehaviour behaviour;
 
-    private MutantState state;
+    private MutantState state = MutantState.IDLE;
 
     private final Vector2D homePosition;
     private Vector2D targetPosition;
-
+    
     private float wanderRadius = 15f;
 
     private float timer = 0f;
 
-    public Mutant(UUID uuid,
-                  Vector2D position,
+    public Mutant(Vector2D position,
                   int maxHealth,
                   int damage,
+                  float speed,
                   EventBus eventBus,
                   String species,
                   MutantBehaviour behaviour) {
-        super(uuid, position, maxHealth, damage, eventBus);
+        super(position, maxHealth, damage, speed, eventBus);
 
         this.species = species;
         this.behaviour = behaviour;
@@ -105,7 +105,6 @@ public class Mutant extends LivingEntity {
 
         float newX = getPosition().x + (dx / distance) * moveDistance;
         float newY = getPosition().y + (dy / distance) * moveDistance;
-
         return new Vector2D(newX, newY);
     }
 

@@ -10,8 +10,8 @@ public abstract class BaseEntity {
     private final UUID id;
     private volatile Vector2D position;
 
-    public BaseEntity(UUID id, Vector2D position) {
-        this.id = id;
+    public BaseEntity(Vector2D position) {
+        this.id = UUID.randomUUID();
         this.position = position;
     }
 

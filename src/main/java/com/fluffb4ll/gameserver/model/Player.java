@@ -1,7 +1,8 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.engine.EventBus;
+
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Defines a player entity.
@@ -9,8 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Player extends LivingEntity {
     private volatile String nickname;
 
-    public Player(UUID uuid, Vector2D position, String nickname, int maxHealth, int damage, EventBus eventBus) {
-        super(uuid, position, maxHealth, damage, eventBus);
+    public Player(Vector2D position, String nickname, int maxHealth, int damage, float speed, EventBus eventBus) {
+        super(position, maxHealth, damage, speed, eventBus);
         this.nickname = nickname;
     }
 

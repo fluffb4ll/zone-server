@@ -2,6 +2,7 @@ package com.fluffb4ll.gameserver.model;
 
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
+import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ public class WorldManager {
                 ChunkCoordinate coordinate = new ChunkCoordinate(cx, cy);
 
                 // TODO: парсить тикрейт из конфига
-                MapChunk chunk = new MapChunk(UUID.randomUUID(), startPoint, endPoint, ChunkState.ACTIVE);
+                MapChunk chunk = new MapChunk(startPoint, endPoint, ChunkState.ACTIVE);
 
                 chunks.put(coordinate, chunk);
             }
@@ -84,6 +85,7 @@ public class WorldManager {
 
         removeEntityFromChunk(entity, currChunk);
         addEntityToChunk(entity, newChunk);
+        WorldLogger.logChunkMigration(entity.getUuid().toString(), currChunk.getId().toString(), newChunk.getId().toString());
     }
 
     private void removeEntityFromChunk(BaseEntity entity, MapChunk chunk) {
@@ -112,5 +114,16 @@ public class WorldManager {
     // TODO: изменять лоды чанков в зависимости от близости игроков
     public void updateChunkLODs() throws Exception {
         return;
+    }
+
+    public void spawnEntity(BaseEntity entity) {
+        MapChunk chunk = getChunkByPosition(entity.getPosition());
+        if (chunk == null)
+            return;
+
+        if (entity instanceof Mutant)
+            chunk.addMutant((Mutant) entity);
+        else if (entity instanceof Anomaly)
+            chunk.addAnomaly((Anomaly) entity);
     }
 }

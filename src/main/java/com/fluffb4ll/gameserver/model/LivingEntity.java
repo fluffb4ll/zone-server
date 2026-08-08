@@ -1,8 +1,10 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.MovementValidator;
 import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
+import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,13 +19,13 @@ public abstract class LivingEntity extends BaseEntity {
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(UUID uuid, Vector2D position, int maxHealth, int damage, EventBus eventBus) {
-        super(uuid, position);
+    public LivingEntity(Vector2D position, int maxHealth, int damage, float speed, EventBus eventBus) {
+        super(position);
 
         health = new AtomicInteger(maxHealth);
         this.maxHealth = new AtomicInteger(maxHealth);
         this.damage = new AtomicInteger(damage);
-        speed = new AtomicFloat();
+        this.speed = new AtomicFloat(speed);
 
         this.eventBus = eventBus;
     }
@@ -69,6 +71,7 @@ public abstract class LivingEntity extends BaseEntity {
         if (!MovementValidator.isValidMove(getPosition(), newPos))
             return false;
         setPosition(newPos);
+        WorldLogger.logEntityMove(getUuid().toString(), newPos.x, newPos.y);
         return true;
     }
 
