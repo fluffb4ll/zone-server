@@ -3,7 +3,6 @@ package com.fluffb4ll.gameserver.engine;
 import com.fluffb4ll.gameserver.model.MapChunk;
 import com.fluffb4ll.gameserver.model.WorldManager;
 import com.fluffb4ll.gameserver.util.WorldLogger;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 
@@ -62,7 +61,7 @@ public class GameLoop {
                     chunkWorkerPool.submit(() -> {
                         // проверяем, какой именно поток забрал чанк в работу
                         // System.out.printf("[%s] Processing chunk %s%n", Thread.currentThread().getName(), chunk.getCoords());
-                        chunk.tick(tickCount, 1f / TICK_RATE, worldManager);
+                        chunk.tick(tickCount, isSecondTick, 1f / TICK_RATE, worldManager);
                     });
                 }
             });

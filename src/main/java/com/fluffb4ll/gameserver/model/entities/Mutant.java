@@ -1,41 +1,41 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.model.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
 import com.fluffb4ll.gameserver.model.enums.MutantState;
 
 import java.util.Random;
-import java.util.UUID;
 
 public class Mutant extends LivingEntity {
     private static final Random RAND = new Random();
 
-    private final String species;
     private MutantBehaviour behaviour;
 
     private MutantState state = MutantState.IDLE;
 
     private final Vector2D homePosition;
     private Vector2D targetPosition;
-    
-    private float wanderRadius = 15f;
+
+    private final float wanderRadius;
 
     private float timer = 0f;
 
     public Mutant(Vector2D position,
+                  String displayName,
                   int maxHealth,
                   int damage,
                   float speed,
                   EventBus eventBus,
-                  String species,
-                  MutantBehaviour behaviour) {
-        super(position, maxHealth, damage, speed, eventBus);
+                  MutantBehaviour behaviour,
+                  float wanderRadius) {
+        super(position, displayName, maxHealth, damage, speed, eventBus);
 
-        this.species = species;
         this.behaviour = behaviour;
 
         this.homePosition = position;
         this.setPosition(generateRandomWanderPoint());
+        this.wanderRadius = wanderRadius;
         timer = 1f + RAND.nextFloat() * 2f;
     }
 
@@ -45,10 +45,6 @@ public class Mutant extends LivingEntity {
 
     public void setBehaviour(MutantBehaviour behaviour) {
         this.behaviour = behaviour;
-    }
-
-    public String getSpecies() {
-        return species;
     }
 
     public MutantState getState() {
@@ -123,6 +119,8 @@ public class Mutant extends LivingEntity {
         float randomX = (float) (homePosition.x + r * Math.cos(angle));
         float randomY = (float) (homePosition.y + r * Math.sin(angle));
 
+        Vector2D pos = getPosition();
+        System.err.printf("%s movement. old: %s %s; new: %s %s%n", getDisplayName(), pos.x, pos.y, randomX, randomY);
         return new Vector2D(randomX, randomY);
     }
 }

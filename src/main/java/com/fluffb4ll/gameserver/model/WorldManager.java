@@ -1,7 +1,9 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.model.entities.*;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -75,6 +76,7 @@ public class WorldManager {
 
         MapChunk newChunk = getChunkByPosition(newPos);
 
+
         if (newChunk == null) {
             handleOutOfBoundsTravel(entity);
             return;
@@ -85,7 +87,7 @@ public class WorldManager {
 
         removeEntityFromChunk(entity, currChunk);
         addEntityToChunk(entity, newChunk);
-        WorldLogger.logChunkMigration(entity.getUuid().toString(), currChunk.getId().toString(), newChunk.getId().toString());
+        WorldLogger.logChunkMigration(entity.getUuid(), currChunk, newChunk);
     }
 
     private void removeEntityFromChunk(BaseEntity entity, MapChunk chunk) {
@@ -125,5 +127,7 @@ public class WorldManager {
             chunk.addMutant((Mutant) entity);
         else if (entity instanceof Anomaly)
             chunk.addAnomaly((Anomaly) entity);
+        else if (entity instanceof Player)
+            chunk.addPlayer((Player) entity);
     }
 }

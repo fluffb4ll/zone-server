@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.util;
 
 public class Vector2D {
     public float x;

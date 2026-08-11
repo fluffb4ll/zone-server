@@ -1,4 +1,6 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.model.entities;
+
+import com.fluffb4ll.gameserver.util.Vector2D;
 
 import java.util.Objects;
 import java.util.UUID;

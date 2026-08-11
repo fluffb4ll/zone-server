@@ -1,17 +1,17 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.model.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.enums.AnomalyState;
-import com.fluffb4ll.gameserver.model.enums.AnomalyType;
+import com.fluffb4ll.gameserver.model.enums.AnomalyElementalType;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Anomaly extends LivingEntity {
-    private final AnomalyType type;
+    private final AnomalyElementalType type;
     private final AtomicFloat radius;
     private final boolean isStatic;
 
@@ -20,29 +20,33 @@ public class Anomaly extends LivingEntity {
     private final Set<LivingEntity> targetsInRange = ConcurrentHashMap.newKeySet();
 
     private float timer = 0f;
-    // TODO: зависимость переменных от типа аномалии, парсинг из конфига
-    private static final float COOLDOWN_TIME = 3f;
-    private static final float CHARGE_TIME = 0.5f;
+
+    private final float cooldownTime;
+    private final float chargeTime;
 
     public Anomaly(Vector2D position,
+                   String displayName,
                    int maxHealth,
                    int damage,
                    float speed,
                    EventBus eventBus,
-                   AnomalyType type,
+                   AnomalyElementalType type,
                    float radius,
-                   boolean isStatic) {
-        super(position, maxHealth, damage, speed, eventBus);
+                   float cooldownTime,
+                   float chargeTime) {
+        super(position, displayName, maxHealth, damage, speed, eventBus);
 
         this.type = type;
         this.radius = new AtomicFloat(radius);
-        this.isStatic = isStatic;
+        this.cooldownTime = cooldownTime;
+        this.chargeTime = chargeTime;
 
+        isStatic = speed <= 0f;
         this.state = AnomalyState.IDLE;
     }
 
 
-    public AnomalyType getType() {
+    public AnomalyElementalType getType() {
         return type;
     }
 
@@ -70,6 +74,7 @@ public class Anomaly extends LivingEntity {
         return targetsInRange.remove(target);
     }
 
+    // TODO: прописать движение нестатичных аномалий?
     public void update(float deltaTime) {
         targetsInRange.removeIf(target -> !target.isAlive());
 
@@ -77,7 +82,10 @@ public class Anomaly extends LivingEntity {
             case IDLE -> {
                 if (!targetsInRange.isEmpty()) {
                     state = AnomalyState.TRIGGERED;
-                    timer = CHARGE_TIME;
+                    if (chargeTime > 0f)
+                        timer = chargeTime;
+                    else
+                        burst();
                 }
             }
             case TRIGGERED -> {
@@ -96,11 +104,18 @@ public class Anomaly extends LivingEntity {
     private void burst() {
         for (LivingEntity target : targetsInRange) {
             target.takeDamage(getDamage());
-            WorldLogger.logAnomalyHit(target.getUuid().toString(), type.toString(), target.getHealth());
+            WorldLogger.logAnomalyHit(
+                    target.getDisplayName(), target.getUuid(), target.getHealth(),
+                    getDisplayName(), getUuid()
+            );
         }
 
-        state = AnomalyState.COOLDOWN;
-        timer = COOLDOWN_TIME;
+        if (cooldownTime > 0f) {
+            state = AnomalyState.COOLDOWN;
+            timer = cooldownTime;
+        }
+        else
+            state = AnomalyState.IDLE;
     }
 
     public boolean isColliding(LivingEntity entity) {

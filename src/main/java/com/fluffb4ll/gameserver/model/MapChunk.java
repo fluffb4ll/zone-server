@@ -1,7 +1,8 @@
 package com.fluffb4ll.gameserver.model;
 
+import com.fluffb4ll.gameserver.model.entities.*;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
-import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.Collections;
@@ -111,8 +112,8 @@ public class MapChunk {
      * @param deltaTime время в секундах, прошедшее с прошлого тика
      * @param worldManager менеджер мира, используется для миграции сущностей
      */
-    public void tick(long tickCount, float deltaTime, WorldManager worldManager) {
-        if (!anomalies.isEmpty() || !mutants.isEmpty())
+    public void tick(long tickCount, boolean shouldLogStatus, float deltaTime, WorldManager worldManager) {
+        if ((!anomalies.isEmpty() || !mutants.isEmpty()) && shouldLogStatus)
             WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y), mutants.size(), anomalies.size());
         tickAnomalies(deltaTime);
         tickMutants(deltaTime, worldManager);

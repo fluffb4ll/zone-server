@@ -1,33 +1,43 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.model.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.MovementValidator;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Defines a living entity, which can move and inflict and receive damage.
  */
 public abstract class LivingEntity extends BaseEntity {
+    private String displayName;
     private final AtomicInteger maxHealth;
     private final AtomicInteger health;
     private final AtomicInteger damage;
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(Vector2D position, int maxHealth, int damage, float speed, EventBus eventBus) {
+    public LivingEntity(Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
         super(position);
 
+        this.displayName = displayName;
         health = new AtomicInteger(maxHealth);
         this.maxHealth = new AtomicInteger(maxHealth);
         this.damage = new AtomicInteger(damage);
         this.speed = new AtomicFloat(speed);
 
         this.eventBus = eventBus;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public synchronized void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public int getDamage() {
@@ -68,10 +78,10 @@ public abstract class LivingEntity extends BaseEntity {
 
     // TODO: переписать движение
     public synchronized boolean move(Vector2D newPos) {
-        if (!MovementValidator.isValidMove(getPosition(), newPos))
+        if (!MovementValidator.isValidMove(getPosition(), newPos) || newPos == getPosition())
             return false;
         setPosition(newPos);
-        WorldLogger.logEntityMove(getUuid().toString(), newPos.x, newPos.y);
+        //WorldLogger.logEntityMove(getUuid().toString(), newPos.x, newPos.y);
         return true;
     }
 

@@ -2,53 +2,47 @@ package com.fluffb4ll.gameserver.util;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.GameLoop;
+import com.fluffb4ll.gameserver.engine.factories.AnomalyFactory;
+import com.fluffb4ll.gameserver.engine.factories.MutantFactory;
 import com.fluffb4ll.gameserver.model.*;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
-import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fluffb4ll.gameserver.model.enums.MutantType;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WorldInitializer {
+    // TODO: убрать, когда напишу подгрузку состояния из бд
+    private final MutantFactory mutantFactory;
+    private final AnomalyFactory anomalyFactory;
 
     private final WorldManager worldManager;
     private final GameLoop gameLoop;
-
-    @Autowired
     private EventBus eventBus;
 
-    public WorldInitializer(WorldManager worldManager, GameLoop gameLoop) {
+
+    public WorldInitializer(EventBus eventBus,
+                            WorldManager worldManager,
+                            GameLoop gameLoop,
+                            MutantFactory mutantFactory,
+                            AnomalyFactory anomalyFactory) {
+        this.eventBus = eventBus;
         this.worldManager = worldManager;
         this.gameLoop = gameLoop;
+        this.mutantFactory = mutantFactory;
+        this.anomalyFactory = anomalyFactory;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
-        Mutant testMutant = new Mutant(
-                new Vector2D(50.0f, 50.0f),
-                100,
-                15,
-                1,
-                eventBus,
-                "BlindDog",
-                MutantBehaviour.NEUTRAL
-        );
+        mutantFactory.create(MutantType.BLIND_DOG, new Vector2D(70f, 25f));
+        mutantFactory.create(MutantType.BLOODSUCKER, new Vector2D(50f, 50f));
+        mutantFactory.create(MutantType.FLESH, new Vector2D(30f, 30f));
 
-        Anomaly testAnomaly = new Anomaly(
-                new Vector2D(53.0f, 50.0f),
-                1000,
-                50,
-                0,
-                eventBus,
-                AnomalyType.THERMAL,
-                3.0f,
-                true
-        );
-
-        worldManager.spawnEntity(testMutant);
-        worldManager.spawnEntity(testAnomaly);
+        anomalyFactory.create(AnomalyType.ELECTRO, new Vector2D(75f, 30f));
+        anomalyFactory.create(AnomalyType.GAS_CLOUD, new Vector2D(40f, 15f));
+        anomalyFactory.create(AnomalyType.VORTEX, new Vector2D(40f, 40f));
 
         gameLoop.start();
     }
