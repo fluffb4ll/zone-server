@@ -12,9 +12,9 @@ public class MutantNest extends SpawnerTerrain {
 
     private final MutantFactory factory;
 
-    public MutantNest(Vector2D position, float radius, float spawningTimer, int entityLimit, EventBus eventBus,
+    public MutantNest(String displayName, Vector2D position, float radius, int entityLimit, EventBus eventBus,
                       MutantType spawningType, MutantFactory factory) {
-        super(position, radius, spawningTimer, entityLimit, eventBus);
+        super(displayName, position, radius, spawningType.getSpawnCooldown(), entityLimit, eventBus);
 
         this.spawningType = spawningType;
         this.factory = factory;
@@ -26,7 +26,7 @@ public class MutantNest extends SpawnerTerrain {
 
     @Override
     protected void spawn() {
-        Mutant mutant = factory.create(spawningType, this, RandTools.generateRandomPoint(getRadius(), getPosition()));
+        Mutant mutant = factory.spawn(spawningType, this, RandTools.generateRandomPoint(getRadius(), getPosition()));
         addEntity(mutant);
         setTimer(getSpawnCooldown());
     }

@@ -4,6 +4,7 @@ import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.GameLoop;
 import com.fluffb4ll.gameserver.engine.factories.AnomalyFactory;
 import com.fluffb4ll.gameserver.engine.factories.MutantFactory;
+import com.fluffb4ll.gameserver.engine.factories.SpawnerFactory;
 import com.fluffb4ll.gameserver.model.*;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
@@ -17,6 +18,8 @@ public class WorldInitializer {
     private final MutantFactory mutantFactory;
     private final AnomalyFactory anomalyFactory;
 
+    private final SpawnerFactory spawnerFactory;
+
     private final WorldManager worldManager;
     private final GameLoop gameLoop;
     private EventBus eventBus;
@@ -26,16 +29,19 @@ public class WorldInitializer {
                             WorldManager worldManager,
                             GameLoop gameLoop,
                             MutantFactory mutantFactory,
-                            AnomalyFactory anomalyFactory) {
+                            AnomalyFactory anomalyFactory,
+                            SpawnerFactory spawnerFactory) {
         this.eventBus = eventBus;
         this.worldManager = worldManager;
         this.gameLoop = gameLoop;
         this.mutantFactory = mutantFactory;
         this.anomalyFactory = anomalyFactory;
+        this.spawnerFactory = spawnerFactory;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
+
 //        mutantFactory.create(MutantType.BLIND_DOG, new Vector2D(70f, 25f));
 //        mutantFactory.create(MutantType.BLOODSUCKER, new Vector2D(50f, 50f));
 //        mutantFactory.create(MutantType.FLESH, new Vector2D(30f, 30f));
@@ -44,6 +50,7 @@ public class WorldInitializer {
 //        anomalyFactory.create(AnomalyType.GAS_CLOUD, new Vector2D(40f, 15f));
 //        anomalyFactory.create(AnomalyType.VORTEX, new Vector2D(40f, 40f));
 
+        spawnerFactory.spawnNest("Test Nest", new Vector2D(70f, 25f), 15f, MutantType.BLIND_DOG, 3);
         gameLoop.start();
     }
 }

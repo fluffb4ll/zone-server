@@ -8,11 +8,13 @@ import java.util.UUID;
 
 public abstract class Terrain {
     private final UUID id;
+    private final String displayName;
     private Vector2D position;
     private final AtomicFloat radius;
 
-    public Terrain(Vector2D position, float radius) {
+    public Terrain(String displayName, Vector2D position, float radius) {
         this.id = UUID.randomUUID();
+        this.displayName = displayName;
         this.position = position;
         this.radius = new AtomicFloat(radius);
     }

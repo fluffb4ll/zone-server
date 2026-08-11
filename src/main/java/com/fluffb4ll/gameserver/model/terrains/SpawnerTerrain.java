@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SpawnerTerrain extends Terrain {
+public abstract class SpawnerTerrain extends Terrain {
     private final EventBus eventBus;
     private final float spawnCooldown;
     private final int entityLimit;
@@ -19,9 +19,9 @@ public class SpawnerTerrain extends Terrain {
 
     private float timer = 0f;
 
-    public SpawnerTerrain(Vector2D position, float radius, float spawnCooldown, int entityLimit, EventBus eventBus) {
-        super(position, radius);
-        this.spawnCooldown = spawnCooldown;
+    public SpawnerTerrain(String displayName, Vector2D position, float radius, float spawnCooldown, int entityLimit, EventBus eventBus) {
+        super(displayName, position, radius);
+        timer = this.spawnCooldown = spawnCooldown;
         this.entityLimit = entityLimit;
 
         this.eventBus = eventBus;

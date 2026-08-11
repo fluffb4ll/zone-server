@@ -2,6 +2,7 @@ package com.fluffb4ll.gameserver.model;
 
 import com.fluffb4ll.gameserver.model.entities.*;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
+import com.fluffb4ll.gameserver.model.terrains.SpawnerTerrain;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
@@ -21,9 +22,13 @@ public class MapChunk {
     private final Vector2D startPoint;
     private final Vector2D endPoint;
 
+    // сущности
     private final Set<Player> players;
     private final Set<Anomaly> anomalies;
     private final Set<Mutant> mutants;
+
+    // террейны
+    private final Set<SpawnerTerrain> spawners;
 
     private ChunkState chunkState;
 
@@ -35,6 +40,8 @@ public class MapChunk {
         players = ConcurrentHashMap.newKeySet();
         anomalies = ConcurrentHashMap.newKeySet();
         mutants = ConcurrentHashMap.newKeySet();
+
+        spawners = ConcurrentHashMap.newKeySet();
 
         this.chunkState = chunkState;
     }
@@ -63,6 +70,10 @@ public class MapChunk {
         return Collections.unmodifiableSet(mutants);
     }
 
+    public Set<SpawnerTerrain> getSpawners() {
+        return Collections.unmodifiableSet(spawners);
+    }
+
     public Stream<BaseEntity> getAllEntitiesStream() {
         return Stream.concat(players.stream(),
                 Stream.concat(mutants.stream(), anomalies.stream())
@@ -85,6 +96,10 @@ public class MapChunk {
         return mutants.add(mutant);
     }
 
+    public boolean addSpawner(SpawnerTerrain spawner) {
+        return spawners.add(spawner);
+    }
+
     public boolean removePlayer(Player player) {
         return players.remove(player);
     }
@@ -95,6 +110,10 @@ public class MapChunk {
 
     public boolean removeMutant(Mutant mutant) {
         return mutants.remove(mutant);
+    }
+
+    public boolean removeSpawner(SpawnerTerrain spawner) {
+        return spawners.remove(spawner);
     }
 
     public synchronized void setState(ChunkState chunkState) {
@@ -117,6 +136,7 @@ public class MapChunk {
             WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y), mutants.size(), anomalies.size());
         tickAnomalies(deltaTime);
         tickMutants(deltaTime, worldManager);
+        tickSpawners(deltaTime);
         resolveCollisions();
         cleanUpDeadEntities();
     }
@@ -134,6 +154,11 @@ public class MapChunk {
             Vector2D newPos = mutant.calculateNextPosition(deltaTime);
             worldManager.moveEntity(mutant, this, newPos);
         }
+    }
+
+    private void tickSpawners(float deltaTime) {
+        for (SpawnerTerrain spawner : spawners)
+            spawner.update(deltaTime);
     }
 
     private void resolveCollisions() {

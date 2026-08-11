@@ -3,6 +3,9 @@ package com.fluffb4ll.gameserver.model;
 import com.fluffb4ll.gameserver.model.entities.*;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
+import com.fluffb4ll.gameserver.model.terrains.MutantNest;
+import com.fluffb4ll.gameserver.model.terrains.SpawnerTerrain;
+import com.fluffb4ll.gameserver.model.terrains.Terrain;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PostConstruct;
@@ -123,11 +126,22 @@ public class WorldManager {
         if (chunk == null)
             return;
 
-        if (entity instanceof Mutant)
-            chunk.addMutant((Mutant) entity);
-        else if (entity instanceof Anomaly)
-            chunk.addAnomaly((Anomaly) entity);
-        else if (entity instanceof Player)
-            chunk.addPlayer((Player) entity);
+        switch (entity) {
+            case Mutant mutant -> chunk.addMutant(mutant);
+            case Anomaly anomaly -> chunk.addAnomaly(anomaly);
+            case Player player -> chunk.addPlayer(player);
+            default -> {}
+        }
+    }
+
+    public void spawnTerrain(Terrain terrain) {
+        MapChunk chunk = getChunkByPosition(terrain.getPosition());
+        if (chunk == null)
+            return;
+
+        switch (terrain) {
+            case SpawnerTerrain spawner -> chunk.addSpawner(spawner);
+            default -> {}
+        }
     }
 }
