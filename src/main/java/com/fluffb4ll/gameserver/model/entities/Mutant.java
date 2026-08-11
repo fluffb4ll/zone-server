@@ -1,6 +1,7 @@
 package com.fluffb4ll.gameserver.model.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.util.RandTools;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
 import com.fluffb4ll.gameserver.model.enums.MutantState;
@@ -14,7 +15,7 @@ public class Mutant extends LivingEntity {
 
     private MutantState state = MutantState.IDLE;
 
-    private final Vector2D homePosition;
+    //private final MutantNest home;
     private Vector2D targetPosition;
 
     private final float wanderRadius;
@@ -33,8 +34,7 @@ public class Mutant extends LivingEntity {
 
         this.behaviour = behaviour;
 
-        this.homePosition = position;
-        this.setPosition(generateRandomWanderPoint());
+        setPosition(position);
         this.wanderRadius = wanderRadius;
         timer = 1f + RAND.nextFloat() * 2f;
     }
@@ -68,7 +68,8 @@ public class Mutant extends LivingEntity {
     private void handleIdleState(float deltaTime) {
         timer -= deltaTime;
         if (timer <= 0f) {
-            targetPosition = generateRandomWanderPoint();
+            targetPosition = RandTools.generateRandomPoint(wanderRadius, homePosition);
+
             state = MutantState.WANDER;
         }
     }
@@ -110,17 +111,5 @@ public class Mutant extends LivingEntity {
         float dx = targetPosition.x - getPosition().x;
         float dy = targetPosition.y - getPosition().y;
         return (dx * dx + dy * dy) <= 0.05f;
-    }
-
-    private Vector2D generateRandomWanderPoint() {
-        double angle = RAND.nextDouble() * Math.PI * 2;
-        double r = Math.sqrt(RAND.nextDouble()) * wanderRadius;
-
-        float randomX = (float) (homePosition.x + r * Math.cos(angle));
-        float randomY = (float) (homePosition.y + r * Math.sin(angle));
-
-        Vector2D pos = getPosition();
-        System.err.printf("%s movement. old: %s %s; new: %s %s%n", getDisplayName(), pos.x, pos.y, randomX, randomY);
-        return new Vector2D(randomX, randomY);
     }
 }

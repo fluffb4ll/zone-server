@@ -81,7 +81,7 @@ public abstract class LivingEntity extends BaseEntity {
         if (!MovementValidator.isValidMove(getPosition(), newPos) || newPos == getPosition())
             return false;
         setPosition(newPos);
-        //WorldLogger.logEntityMove(getUuid().toString(), newPos.x, newPos.y);
+        //WorldLogger.logEntityMove(getUuid(), newPos.x, newPos.y);
         return true;
     }
 
