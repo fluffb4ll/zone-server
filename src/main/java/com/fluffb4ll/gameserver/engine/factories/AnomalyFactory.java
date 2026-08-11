@@ -14,7 +14,7 @@ public class AnomalyFactory extends EntityFactory {
     }
 
     public Anomaly create(AnomalyType type, Vector2D pos) {
-        Anomaly anomaly = new Anomaly(
+        return new Anomaly(
                 pos,
                 type.getDisplayName(),
                 type.getMaxHealth(),
@@ -26,7 +26,10 @@ public class AnomalyFactory extends EntityFactory {
                 type.getCooldownTime(),
                 type.getChargeTime()
         );
+    }
 
+    public Anomaly spawn(AnomalyType type, Vector2D pos) {
+        Anomaly anomaly = create(type, pos);
         worldManager.spawnEntity(anomaly);
         return anomaly;
     }

@@ -1,6 +1,7 @@
 package com.fluffb4ll.gameserver.model.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.model.terrains.MutantNest;
 import com.fluffb4ll.gameserver.util.RandTools;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
@@ -15,7 +16,7 @@ public class Mutant extends LivingEntity {
 
     private MutantState state = MutantState.IDLE;
 
-    //private final MutantNest home;
+    private final MutantNest home;
     private Vector2D targetPosition;
 
     private final float wanderRadius;
@@ -29,14 +30,16 @@ public class Mutant extends LivingEntity {
                   float speed,
                   EventBus eventBus,
                   MutantBehaviour behaviour,
+                  MutantNest home,
                   float wanderRadius) {
         super(position, displayName, maxHealth, damage, speed, eventBus);
 
         this.behaviour = behaviour;
-
-        setPosition(position);
+        this.home = home;
         this.wanderRadius = wanderRadius;
         timer = 1f + RAND.nextFloat() * 2f;
+
+        setPosition(position);
     }
 
     public MutantBehaviour getBehaviour() {
@@ -68,7 +71,7 @@ public class Mutant extends LivingEntity {
     private void handleIdleState(float deltaTime) {
         timer -= deltaTime;
         if (timer <= 0f) {
-            targetPosition = RandTools.generateRandomPoint(wanderRadius, homePosition);
+            targetPosition = RandTools.generateRandomPoint(wanderRadius, home.getPosition());
 
             state = MutantState.WANDER;
         }

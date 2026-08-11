@@ -36,13 +36,13 @@ public class WorldInitializer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
-        mutantFactory.create(MutantType.BLIND_DOG, new Vector2D(70f, 25f));
-        mutantFactory.create(MutantType.BLOODSUCKER, new Vector2D(50f, 50f));
-        mutantFactory.create(MutantType.FLESH, new Vector2D(30f, 30f));
+//        mutantFactory.create(MutantType.BLIND_DOG, new Vector2D(70f, 25f));
+//        mutantFactory.create(MutantType.BLOODSUCKER, new Vector2D(50f, 50f));
+//        mutantFactory.create(MutantType.FLESH, new Vector2D(30f, 30f));
 
-        anomalyFactory.create(AnomalyType.ELECTRO, new Vector2D(75f, 30f));
-        anomalyFactory.create(AnomalyType.GAS_CLOUD, new Vector2D(40f, 15f));
-        anomalyFactory.create(AnomalyType.VORTEX, new Vector2D(40f, 40f));
+//        anomalyFactory.create(AnomalyType.ELECTRO, new Vector2D(75f, 30f));
+//        anomalyFactory.create(AnomalyType.GAS_CLOUD, new Vector2D(40f, 15f));
+//        anomalyFactory.create(AnomalyType.VORTEX, new Vector2D(40f, 40f));
 
         gameLoop.start();
     }

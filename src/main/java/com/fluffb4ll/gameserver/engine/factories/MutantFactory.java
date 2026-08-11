@@ -4,6 +4,7 @@ import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.model.WorldManager;
 import com.fluffb4ll.gameserver.model.entities.Mutant;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
+import com.fluffb4ll.gameserver.model.terrains.MutantNest;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,8 @@ public class MutantFactory extends EntityFactory {
         super(worldManager, eventBus);
     }
 
-    public Mutant create(MutantType type, Vector2D pos) {
-        Mutant mutant = new Mutant(
+    public Mutant create(MutantType type, MutantNest nest, Vector2D pos) {
+        return new Mutant(
                 pos,
                 type.getDisplayName(),
                 type.getMaxHealth(),
@@ -22,9 +23,13 @@ public class MutantFactory extends EntityFactory {
                 type.getSpeed(),
                 this.eventBus,
                 type.getBehaviour(),
+                nest,
                 type.getWanderRadius()
         );
+    }
 
+    public Mutant spawn(MutantType type, MutantNest nest, Vector2D pos) {
+        Mutant mutant = create(type, nest, pos);
         worldManager.spawnEntity(mutant);
         return mutant;
     }

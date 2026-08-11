@@ -26,7 +26,7 @@ public class MutantNest extends SpawnerTerrain {
 
     @Override
     protected void spawn() {
-        Mutant mutant = factory.create(spawningType, RandTools.generateRandomPoint(getRadius(), getPosition()));
+        Mutant mutant = factory.create(spawningType, this, RandTools.generateRandomPoint(getRadius(), getPosition()));
         addEntity(mutant);
         setTimer(getSpawnCooldown());
     }
