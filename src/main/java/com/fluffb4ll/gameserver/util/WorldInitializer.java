@@ -51,6 +51,7 @@ public class WorldInitializer {
 //        anomalyFactory.create(AnomalyType.VORTEX, new Vector2D(40f, 40f));
 
         spawnerFactory.spawnNest("Test Nest", new Vector2D(70f, 25f), 15f, MutantType.BLIND_DOG, 3);
+        spawnerFactory.spawnAnomalies("Test Anomaly Belt", new Vector2D(50f, 40f), 20f, AnomalyType.VORTEX, 10);
         gameLoop.start();
     }
 }
