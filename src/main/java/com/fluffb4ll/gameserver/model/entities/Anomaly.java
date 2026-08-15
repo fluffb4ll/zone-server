@@ -8,6 +8,7 @@ import com.fluffb4ll.gameserver.util.AtomicFloat;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Anomaly extends LivingEntity {
@@ -24,7 +25,8 @@ public class Anomaly extends LivingEntity {
     private final float cooldownTime;
     private final float chargeTime;
 
-    public Anomaly(Vector2D position,
+    public Anomaly(String id,
+                   Vector2D position,
                    String displayName,
                    int maxHealth,
                    int damage,
@@ -34,7 +36,7 @@ public class Anomaly extends LivingEntity {
                    float radius,
                    float cooldownTime,
                    float chargeTime) {
-        super(position, displayName, maxHealth, damage, speed, eventBus);
+        super(id, position, displayName, maxHealth, damage, speed, eventBus);
 
         this.type = type;
         this.radius = new AtomicFloat(radius);

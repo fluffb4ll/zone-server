@@ -6,6 +6,7 @@ import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
 import com.fluffb4ll.gameserver.model.terrains.AnomalyTerrain;
 import com.fluffb4ll.gameserver.model.terrains.MutantNest;
+import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,27 @@ public class SpawnerFactory extends TerrainFactory {
                                  float radius,
                                  MutantType spawningType,
                                  int entityLimit) {
+        String id = IdGeneratorUtil.generateId();
         return new MutantNest(
+                id,
+                displayName,
+                pos,
+                radius,
+                entityLimit,
+                eventBus,
+                spawningType,
+                mutantFactory
+        );
+    }
+
+    public MutantNest createNest(String id,
+                                 String displayName,
+                                 Vector2D pos,
+                                 float radius,
+                                 MutantType spawningType,
+                                 int entityLimit) {
+        return new MutantNest(
+                id,
                 displayName,
                 pos,
                 radius,
@@ -47,12 +68,43 @@ public class SpawnerFactory extends TerrainFactory {
         return nest;
     }
 
+    public MutantNest spawnNest(String id,
+                                String displayName,
+                                Vector2D pos,
+                                float radius,
+                                MutantType spawningType,
+                                int entityLimit) {
+        MutantNest nest = createNest(id, displayName, pos, radius, spawningType, entityLimit);
+        worldManager.spawnTerrain(nest);
+        return nest;
+    }
+
     public AnomalyTerrain createAnomalies(String displayName,
                                           Vector2D pos,
                                           float radius,
                                           AnomalyType spawningType,
                                           int entityLimit) {
+        String id = IdGeneratorUtil.generateId();
         return new AnomalyTerrain(
+                id,
+                displayName,
+                pos,
+                radius,
+                entityLimit,
+                eventBus,
+                spawningType,
+                anomalyFactory
+        );
+    }
+
+    public AnomalyTerrain createAnomalies(String id,
+                                          String displayName,
+                                          Vector2D pos,
+                                          float radius,
+                                          AnomalyType spawningType,
+                                          int entityLimit) {
+        return new AnomalyTerrain(
+                id,
                 displayName,
                 pos,
                 radius,
@@ -69,6 +121,17 @@ public class SpawnerFactory extends TerrainFactory {
                                          AnomalyType spawningType,
                                          int entityLimit) {
         AnomalyTerrain aTerrain = createAnomalies(displayName, pos, radius, spawningType, entityLimit);
+        worldManager.spawnTerrain(aTerrain);
+        return aTerrain;
+    }
+
+    public AnomalyTerrain spawnAnomalies(String id,
+                                         String displayName,
+                                         Vector2D pos,
+                                         float radius,
+                                         AnomalyType spawningType,
+                                         int entityLimit) {
+        AnomalyTerrain aTerrain = createAnomalies(id, displayName, pos, radius, spawningType, entityLimit);
         worldManager.spawnTerrain(aTerrain);
         return aTerrain;
     }

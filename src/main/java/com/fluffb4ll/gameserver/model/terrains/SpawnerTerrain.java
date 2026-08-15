@@ -7,7 +7,6 @@ import com.fluffb4ll.gameserver.util.Vector2D;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SpawnerTerrain extends Terrain {
@@ -15,12 +14,18 @@ public abstract class SpawnerTerrain extends Terrain {
     private final float spawnCooldown;
     private final int entityLimit;
 
-    private final Map<UUID, LivingEntity> entities = new ConcurrentHashMap<>();
+    private final Map<String, LivingEntity> entities = new ConcurrentHashMap<>();
 
-    private float timer = 0f;
+    private float timer;
 
-    public SpawnerTerrain(String displayName, Vector2D position, float radius, float spawnCooldown, int entityLimit, EventBus eventBus) {
-        super(displayName, position, radius);
+    public SpawnerTerrain(String id,
+                          String displayName,
+                          Vector2D position,
+                          float radius,
+                          float spawnCooldown,
+                          int entityLimit,
+                          EventBus eventBus) {
+        super(id, displayName, position, radius);
         timer = this.spawnCooldown = spawnCooldown;
         this.entityLimit = entityLimit;
 
@@ -49,15 +54,15 @@ public abstract class SpawnerTerrain extends Terrain {
     }
 
     public boolean addEntity(LivingEntity entity) {
-        return entities.put(entity.getUuid(), entity) == null;
+        return entities.put(entity.getId(), entity) == null;
     }
 
     public boolean removeEntity(LivingEntity entity) {
-        return entities.remove(entity.getUuid()) != null;
+        return entities.remove(entity.getId()) != null;
     }
 
     public void onEntityDeath(EntityDeathEvent event) {
-        entities.remove(event.uuid());
+        entities.remove(event.id());
     }
 
     public void update(float deltaTime) {

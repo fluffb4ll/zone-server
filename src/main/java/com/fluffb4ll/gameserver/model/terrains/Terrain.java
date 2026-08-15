@@ -7,13 +7,16 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Terrain {
-    private final UUID id;
+    private final String id;
     private final String displayName;
     private Vector2D position;
     private final AtomicFloat radius;
 
-    public Terrain(String displayName, Vector2D position, float radius) {
-        this.id = UUID.randomUUID();
+    public Terrain(String id,
+                   String displayName,
+                   Vector2D position,
+                   float radius) {
+        this.id = id;
         this.displayName = displayName;
         this.position = position;
         this.radius = new AtomicFloat(radius);
@@ -23,7 +26,7 @@ public abstract class Terrain {
         return position.copy();
     }
 
-    public UUID getUuid() {
+    public String getId() {
         return id;
     }
 

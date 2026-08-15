@@ -8,6 +8,7 @@ import com.fluffb4ll.gameserver.model.enums.MutantBehaviour;
 import com.fluffb4ll.gameserver.model.enums.MutantState;
 
 import java.util.Random;
+import java.util.UUID;
 
 public class Mutant extends LivingEntity {
     private static final Random RAND = new Random();
@@ -23,7 +24,8 @@ public class Mutant extends LivingEntity {
 
     private float timer = 0f;
 
-    public Mutant(Vector2D position,
+    public Mutant(String id,
+                  Vector2D position,
                   String displayName,
                   int maxHealth,
                   int damage,
@@ -32,7 +34,7 @@ public class Mutant extends LivingEntity {
                   MutantBehaviour behaviour,
                   MutantNest home,
                   float wanderRadius) {
-        super(position, displayName, maxHealth, damage, speed, eventBus);
+        super(id, position, displayName, maxHealth, damage, speed, eventBus);
 
         this.behaviour = behaviour;
         this.home = home;

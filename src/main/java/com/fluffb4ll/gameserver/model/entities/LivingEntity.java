@@ -7,6 +7,7 @@ import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,8 +21,8 @@ public abstract class LivingEntity extends BaseEntity {
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
-        super(position);
+    public LivingEntity(String id, Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
+        super(id, position);
 
         this.displayName = displayName;
         health = new AtomicInteger(maxHealth);

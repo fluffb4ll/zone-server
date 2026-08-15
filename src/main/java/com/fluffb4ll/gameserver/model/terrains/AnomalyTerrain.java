@@ -11,10 +11,16 @@ public class AnomalyTerrain extends SpawnerTerrain {
     private final AnomalyType spawningType;
     private final AnomalyFactory factory;
 
-    public AnomalyTerrain(String displayName, Vector2D position, float radius, int entityLimit,
-                          EventBus eventBus, AnomalyType spawningType, AnomalyFactory factory) {
+    public AnomalyTerrain(String id,
+                          String displayName,
+                          Vector2D position,
+                          float radius,
+                          int entityLimit,
+                          EventBus eventBus,
+                          AnomalyType spawningType,
+                          AnomalyFactory factory) {
         float spawnCooldown = 0f;
-        super(displayName, position, radius, spawnCooldown, entityLimit, eventBus);
+        super(id, displayName, position, radius, spawnCooldown, entityLimit, eventBus);
 
         this.spawningType = spawningType;
         this.factory = factory;

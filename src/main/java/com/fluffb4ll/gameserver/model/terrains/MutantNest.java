@@ -12,9 +12,15 @@ public class MutantNest extends SpawnerTerrain {
 
     private final MutantFactory factory;
 
-    public MutantNest(String displayName, Vector2D position, float radius, int entityLimit, EventBus eventBus,
-                      MutantType spawningType, MutantFactory factory) {
-        super(displayName, position, radius, spawningType.getSpawnCooldown(), entityLimit, eventBus);
+    public MutantNest(String id,
+                      String displayName,
+                      Vector2D position,
+                      float radius,
+                      int entityLimit,
+                      EventBus eventBus,
+                      MutantType spawningType,
+                      MutantFactory factory) {
+        super(id, displayName, position, radius, spawningType.getSpawnCooldown(), entityLimit, eventBus);
 
         this.spawningType = spawningType;
         this.factory = factory;

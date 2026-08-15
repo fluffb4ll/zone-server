@@ -9,11 +9,11 @@ import java.util.UUID;
  * Defines a basic entity
  */
 public abstract class BaseEntity {
-    private final UUID id;
+    private final String id;
     private Vector2D position;
 
-    public BaseEntity(Vector2D position) {
-        this.id = UUID.randomUUID();
+    public BaseEntity(String id, Vector2D position) {
+        this.id = id;
         this.position = position;
     }
 
@@ -21,7 +21,7 @@ public abstract class BaseEntity {
         return position.copy();
     }
 
-    public UUID getUuid() {
+    public String getId() {
         return id;
     }
 
