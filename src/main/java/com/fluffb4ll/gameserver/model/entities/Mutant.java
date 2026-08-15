@@ -24,7 +24,7 @@ public class Mutant extends LivingEntity {
 
     private float timer = 0f;
 
-    public Mutant(String id,
+    public Mutant(UUID id,
                   Vector2D position,
                   String displayName,
                   int maxHealth,

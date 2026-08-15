@@ -7,6 +7,7 @@ import com.fluffb4ll.gameserver.util.Vector2D;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class SpawnerTerrain extends Terrain {
@@ -14,11 +15,11 @@ public abstract class SpawnerTerrain extends Terrain {
     private final float spawnCooldown;
     private final int entityLimit;
 
-    private final Map<String, LivingEntity> entities = new ConcurrentHashMap<>();
+    private final Map<UUID, LivingEntity> entities = new ConcurrentHashMap<>();
 
     private float timer;
 
-    public SpawnerTerrain(String id,
+    public SpawnerTerrain(UUID id,
                           String displayName,
                           Vector2D position,
                           float radius,
@@ -54,15 +55,15 @@ public abstract class SpawnerTerrain extends Terrain {
     }
 
     public boolean addEntity(LivingEntity entity) {
-        return entities.put(entity.getId(), entity) == null;
+        return entities.put(entity.getUuid(), entity) == null;
     }
 
     public boolean removeEntity(LivingEntity entity) {
-        return entities.remove(entity.getId()) != null;
+        return entities.remove(entity.getUuid()) != null;
     }
 
     public void onEntityDeath(EntityDeathEvent event) {
-        entities.remove(event.id());
+        entities.remove(event.uuid());
     }
 
     public void update(float deltaTime) {

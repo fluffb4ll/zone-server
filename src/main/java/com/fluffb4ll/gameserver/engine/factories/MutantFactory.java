@@ -18,7 +18,7 @@ public class MutantFactory extends EntityFactory {
     }
 
     public Mutant create(MutantType type, MutantNest nest, Vector2D pos) {
-        String id = IdGeneratorUtil.generateId();
+        UUID id = IdGeneratorUtil.generateId();
         return new Mutant(
                 id,
                 pos,
@@ -39,7 +39,7 @@ public class MutantFactory extends EntityFactory {
         return mutant;
     }
 
-    public Mutant create(String id, MutantType type, MutantNest nest, Vector2D pos) {
+    public Mutant create(UUID id, MutantType type, MutantNest nest, Vector2D pos) {
         return new Mutant(
                 id,
                 pos,
@@ -54,7 +54,7 @@ public class MutantFactory extends EntityFactory {
         );
     }
 
-    public Mutant spawn(String id, MutantType type, MutantNest nest, Vector2D pos) {
+    public Mutant spawn(UUID id, MutantType type, MutantNest nest, Vector2D pos) {
         Mutant mutant = create(id, type, nest, pos);
         worldManager.spawnEntity(mutant);
         return mutant;

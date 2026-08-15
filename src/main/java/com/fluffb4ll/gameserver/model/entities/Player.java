@@ -9,7 +9,7 @@ import java.util.UUID;
  * Defines a player entity.
  */
 public class Player extends LivingEntity {
-    public Player(String id,
+    public Player(UUID id,
                   Vector2D position,
                   String displayName,
                   int maxHealth,

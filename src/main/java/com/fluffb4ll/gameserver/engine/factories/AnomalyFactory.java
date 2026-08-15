@@ -8,6 +8,8 @@ import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class AnomalyFactory extends EntityFactory {
     public AnomalyFactory(WorldManager worldManager, EventBus eventBus) {
@@ -15,7 +17,7 @@ public class AnomalyFactory extends EntityFactory {
     }
 
     public Anomaly create(AnomalyType type, Vector2D pos) {
-        String id = IdGeneratorUtil.generateId();
+        UUID id = IdGeneratorUtil.generateId();
         return new Anomaly(
                 id,
                 pos,
@@ -37,7 +39,7 @@ public class AnomalyFactory extends EntityFactory {
         return anomaly;
     }
 
-    public Anomaly create(String id, AnomalyType type, Vector2D pos) {
+    public Anomaly create(UUID id, AnomalyType type, Vector2D pos) {
         return new Anomaly(
                 id,
                 pos,
@@ -53,7 +55,7 @@ public class AnomalyFactory extends EntityFactory {
         );
     }
 
-    public Anomaly spawn(String id, AnomalyType type, Vector2D pos) {
+    public Anomaly spawn(UUID id, AnomalyType type, Vector2D pos) {
         Anomaly anomaly = create(id, type, pos);
         worldManager.spawnEntity(anomaly);
         return anomaly;

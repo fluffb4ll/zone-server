@@ -7,11 +7,13 @@ import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.util.RandTools;
 import com.fluffb4ll.gameserver.util.Vector2D;
 
+import java.util.UUID;
+
 public class AnomalyTerrain extends SpawnerTerrain {
     private final AnomalyType spawningType;
     private final AnomalyFactory factory;
 
-    public AnomalyTerrain(String id,
+    public AnomalyTerrain(UUID id,
                           String displayName,
                           Vector2D position,
                           float radius,

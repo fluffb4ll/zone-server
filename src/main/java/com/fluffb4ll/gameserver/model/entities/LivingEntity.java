@@ -21,7 +21,7 @@ public abstract class LivingEntity extends BaseEntity {
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(String id, Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
+    public LivingEntity(UUID id, Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
         super(id, position);
 
         this.displayName = displayName;

@@ -10,6 +10,8 @@ import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class SpawnerFactory extends TerrainFactory {
     private final MutantFactory mutantFactory;
@@ -27,7 +29,7 @@ public class SpawnerFactory extends TerrainFactory {
                                  float radius,
                                  MutantType spawningType,
                                  int entityLimit) {
-        String id = IdGeneratorUtil.generateId();
+        UUID id = IdGeneratorUtil.generateId();
         return new MutantNest(
                 id,
                 displayName,
@@ -40,7 +42,7 @@ public class SpawnerFactory extends TerrainFactory {
         );
     }
 
-    public MutantNest createNest(String id,
+    public MutantNest createNest(UUID id,
                                  String displayName,
                                  Vector2D pos,
                                  float radius,
@@ -68,7 +70,7 @@ public class SpawnerFactory extends TerrainFactory {
         return nest;
     }
 
-    public MutantNest spawnNest(String id,
+    public MutantNest spawnNest(UUID id,
                                 String displayName,
                                 Vector2D pos,
                                 float radius,
@@ -84,7 +86,7 @@ public class SpawnerFactory extends TerrainFactory {
                                           float radius,
                                           AnomalyType spawningType,
                                           int entityLimit) {
-        String id = IdGeneratorUtil.generateId();
+        UUID id = IdGeneratorUtil.generateId();
         return new AnomalyTerrain(
                 id,
                 displayName,
@@ -97,7 +99,7 @@ public class SpawnerFactory extends TerrainFactory {
         );
     }
 
-    public AnomalyTerrain createAnomalies(String id,
+    public AnomalyTerrain createAnomalies(UUID id,
                                           String displayName,
                                           Vector2D pos,
                                           float radius,
@@ -125,7 +127,7 @@ public class SpawnerFactory extends TerrainFactory {
         return aTerrain;
     }
 
-    public AnomalyTerrain spawnAnomalies(String id,
+    public AnomalyTerrain spawnAnomalies(UUID id,
                                          String displayName,
                                          Vector2D pos,
                                          float radius,

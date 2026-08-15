@@ -25,7 +25,7 @@ public class Anomaly extends LivingEntity {
     private final float cooldownTime;
     private final float chargeTime;
 
-    public Anomaly(String id,
+    public Anomaly(UUID id,
                    Vector2D position,
                    String displayName,
                    int maxHealth,

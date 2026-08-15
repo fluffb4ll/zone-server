@@ -7,12 +7,14 @@ import com.fluffb4ll.gameserver.model.enums.MutantType;
 import com.fluffb4ll.gameserver.util.RandTools;
 import com.fluffb4ll.gameserver.util.Vector2D;
 
+import java.util.UUID;
+
 public class MutantNest extends SpawnerTerrain {
     private final MutantType spawningType;
 
     private final MutantFactory factory;
 
-    public MutantNest(String id,
+    public MutantNest(UUID id,
                       String displayName,
                       Vector2D position,
                       float radius,
