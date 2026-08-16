@@ -14,24 +14,33 @@ import java.util.Base64;
  * Это сделано для того, чтобы алгоритм BCrypt не обрезал хвост длинного пароля при хэшировании. */
 public class PepperedBCryptEncoder implements PasswordEncoder {
     private final PasswordEncoder bcrypt;
-    private final String pepper;
+    private final SecretKeySpec secret;
 
     public PepperedBCryptEncoder(String pepper, int bcryptStrength) {
         if (pepper == null || pepper.isBlank()) {
             throw new IllegalArgumentException("Pepper must not be empty");
         }
-        this.pepper = pepper;
+        this.secret = new SecretKeySpec(
+                pepper.getBytes(StandardCharsets.UTF_8),
+                "HmacSHA256"
+        );
         bcrypt = new BCryptPasswordEncoder(bcryptStrength);
     }
 
     @Override
     public @Nullable String encode(@Nullable CharSequence rawPassword) {
+        if (rawPassword == null)
+            throw new IllegalArgumentException("Password must not be null");
+
         String peppered = hmacSha256(rawPassword);
         return bcrypt.encode(peppered);
     }
 
     @Override
     public boolean matches(@Nullable CharSequence rawPassword, @Nullable String encodedPassword) {
+        if (rawPassword == null || encodedPassword == null)
+            throw new IllegalArgumentException("Passwords must not be null");
+
         String peppered = hmacSha256(rawPassword);
         return bcrypt.matches(peppered, encodedPassword);
     }
@@ -39,10 +48,6 @@ public class PepperedBCryptEncoder implements PasswordEncoder {
     private String hmacSha256(CharSequence rawPassword) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
-            SecretKeySpec secret = new SecretKeySpec(
-                    pepper.getBytes(StandardCharsets.UTF_8),
-                    "HmacSHA256"
-            );
             mac.init(secret);
             byte[] hmacBytes = mac.doFinal(rawPassword.toString().getBytes(StandardCharsets.UTF_8));
 

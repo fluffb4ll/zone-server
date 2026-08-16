@@ -4,6 +4,7 @@ import com.fluffb4ll.gameserver.model.database.entities.AuthTokenEntity;
 import com.fluffb4ll.gameserver.model.database.entities.PlayerEntity;
 import com.fluffb4ll.gameserver.model.database.repositories.AuthTokenRepository;
 import com.fluffb4ll.gameserver.model.database.repositories.PlayerRepository;
+import com.fluffb4ll.gameserver.util.RegexValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,20 @@ public class PlayerAuthService {
         AuthTokenEntity authTokenEntity = new AuthTokenEntity(player.getId(), token);
         tokenRepository.save(authTokenEntity);
         return token;
+    }
+
+    @Transactional
+    public UUID signup(String nickname, String rawPassword) {
+        if (!RegexValidator.isValidPassword(rawPassword))
+            throw new SecurityException(
+                    "Invalid password. Password must be at least 8 characters long and contain" +
+                    "digits and Latin letters");
+        if (!RegexValidator.isValidNickname(nickname))
+            throw new SecurityException("Invalid nickname");
+
+        String encodedPassword = passEncoder.encode(rawPassword);
+        PlayerEntity player = new PlayerEntity(encodedPassword, nickname);
+        playerRepository.save(player);
+        return player.getId();
     }
 }

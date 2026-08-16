@@ -1,8 +1,10 @@
 package com.fluffb4ll.gameserver.model.controllers;
 
+import com.fluffb4ll.gameserver.dto.rest.request.AuthDto;
 import com.fluffb4ll.gameserver.engine.PlayerAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,9 +20,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(String nickname, String rawPassword) {
+    public ResponseEntity<String> login(@RequestBody AuthDto authDto) {
         try {
-            UUID token = authService.login(nickname, rawPassword);
+            UUID token = authService.login(authDto.nickname(), authDto.rawPassword());
+            return ResponseEntity.ok(token.toString());
+        } catch (SecurityException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<String> signup(@RequestBody AuthDto authDto) {
+        try {
+            UUID token = authService.signup(authDto.nickname(), authDto.rawPassword());
             return ResponseEntity.ok(token.toString());
         } catch (SecurityException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

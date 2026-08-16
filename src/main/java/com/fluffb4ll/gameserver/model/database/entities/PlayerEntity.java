@@ -1,5 +1,6 @@
 package com.fluffb4ll.gameserver.model.database.entities;
 
+import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ public class PlayerEntity {
     private String password;
 
     @Column(name = "nickname", length = 16, nullable = false, unique = true)
-    private String displayName;
+    private String nickname;
 
     @Column(name = "max_health")
     private int maxHealth;
@@ -37,18 +38,26 @@ public class PlayerEntity {
 
     public PlayerEntity(UUID id,
                         String password,
-                        String displayName,
+                        String nickname,
                         int maxHealth,
                         int currHealth,
                         Vector2D pos)
     {
         this.id = id;
         this.password = password;
-        this.displayName = displayName;
+        this.nickname = nickname;
         this.maxHealth = maxHealth;
         this.currHealth = currHealth;
         posX = pos.x;
         posY = pos.y;
+    }
+
+    public PlayerEntity(String password,
+                        String nickname)
+    {
+        id = IdGeneratorUtil.generateId();
+        this.password = password;
+        this.nickname = nickname;
     }
 
     public UUID getId() {
@@ -67,12 +76,12 @@ public class PlayerEntity {
         this.password = password;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setNickname(String displayName) {
+        this.nickname = displayName;
     }
 
     public int getMaxHealth() {
