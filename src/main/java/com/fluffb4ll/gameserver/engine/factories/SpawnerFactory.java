@@ -1,11 +1,11 @@
 package com.fluffb4ll.gameserver.engine.factories;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.model.WorldManager;
+import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
-import com.fluffb4ll.gameserver.model.terrains.AnomalyTerrain;
-import com.fluffb4ll.gameserver.model.terrains.MutantNest;
+import com.fluffb4ll.gameserver.engine.terrains.AnomalyTerrain;
+import com.fluffb4ll.gameserver.engine.terrains.MutantNest;
 import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;

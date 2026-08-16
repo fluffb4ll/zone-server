@@ -1,7 +1,7 @@
 package com.fluffb4ll.gameserver.engine.factories;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.model.WorldManager;
+import com.fluffb4ll.gameserver.engine.WorldManager;
 
 public abstract class EntityFactory {
     protected final WorldManager worldManager;

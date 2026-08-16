@@ -1,7 +1,7 @@
-package com.fluffb4ll.gameserver.model.controllers;
+package com.fluffb4ll.gameserver.controller;
 
 import com.fluffb4ll.gameserver.dto.rest.request.AuthDto;
-import com.fluffb4ll.gameserver.engine.PlayerAuthService;
+import com.fluffb4ll.gameserver.service.PlayerAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

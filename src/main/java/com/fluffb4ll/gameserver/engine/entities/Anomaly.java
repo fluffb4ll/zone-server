@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.model.entities;
+package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.util.Vector2D;

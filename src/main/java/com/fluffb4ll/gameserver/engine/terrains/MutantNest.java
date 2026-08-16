@@ -1,8 +1,8 @@
-package com.fluffb4ll.gameserver.model.terrains;
+package com.fluffb4ll.gameserver.engine.terrains;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.factories.MutantFactory;
-import com.fluffb4ll.gameserver.model.entities.Mutant;
+import com.fluffb4ll.gameserver.engine.entities.Mutant;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
 import com.fluffb4ll.gameserver.util.RandTools;
 import com.fluffb4ll.gameserver.util.Vector2D;

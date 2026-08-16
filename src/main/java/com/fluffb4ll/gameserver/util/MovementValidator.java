@@ -1,6 +1,4 @@
-package com.fluffb4ll.gameserver.engine;
-
-import com.fluffb4ll.gameserver.util.Vector2D;
+package com.fluffb4ll.gameserver.util;
 
 public class MovementValidator {
 

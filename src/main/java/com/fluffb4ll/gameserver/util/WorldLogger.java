@@ -1,6 +1,6 @@
 package com.fluffb4ll.gameserver.util;
 
-import com.fluffb4ll.gameserver.model.MapChunk;
+import com.fluffb4ll.gameserver.engine.MapChunk;
 
 import java.util.UUID;
 

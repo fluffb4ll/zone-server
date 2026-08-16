@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.model.database.entities;
+package com.fluffb4ll.gameserver.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

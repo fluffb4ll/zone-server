@@ -1,8 +1,8 @@
-package com.fluffb4ll.gameserver.model;
+package com.fluffb4ll.gameserver.engine;
 
-import com.fluffb4ll.gameserver.model.entities.*;
+import com.fluffb4ll.gameserver.engine.entities.*;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
-import com.fluffb4ll.gameserver.model.terrains.SpawnerTerrain;
+import com.fluffb4ll.gameserver.engine.terrains.SpawnerTerrain;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 

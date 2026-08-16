@@ -1,7 +1,5 @@
 package com.fluffb4ll.gameserver.engine;
 
-import com.fluffb4ll.gameserver.model.MapChunk;
-import com.fluffb4ll.gameserver.model.WorldManager;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;

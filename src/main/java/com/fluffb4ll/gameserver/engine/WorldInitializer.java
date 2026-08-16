@@ -1,13 +1,11 @@
-package com.fluffb4ll.gameserver.util;
+package com.fluffb4ll.gameserver.engine;
 
-import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.engine.GameLoop;
 import com.fluffb4ll.gameserver.engine.factories.AnomalyFactory;
 import com.fluffb4ll.gameserver.engine.factories.MutantFactory;
 import com.fluffb4ll.gameserver.engine.factories.SpawnerFactory;
-import com.fluffb4ll.gameserver.model.*;
 import com.fluffb4ll.gameserver.model.enums.AnomalyType;
 import com.fluffb4ll.gameserver.model.enums.MutantType;
+import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

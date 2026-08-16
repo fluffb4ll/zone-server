@@ -1,7 +1,7 @@
-package com.fluffb4ll.gameserver.model.terrains;
+package com.fluffb4ll.gameserver.engine.terrains;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.model.entities.LivingEntity;
+import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
 import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.Vector2D;
 

@@ -1,9 +1,9 @@
-package com.fluffb4ll.gameserver.engine;
+package com.fluffb4ll.gameserver.service;
 
-import com.fluffb4ll.gameserver.model.database.entities.AuthTokenEntity;
-import com.fluffb4ll.gameserver.model.database.entities.PlayerEntity;
-import com.fluffb4ll.gameserver.model.database.repositories.AuthTokenRepository;
-import com.fluffb4ll.gameserver.model.database.repositories.PlayerRepository;
+import com.fluffb4ll.gameserver.entity.AuthTokenEntity;
+import com.fluffb4ll.gameserver.entity.PlayerEntity;
+import com.fluffb4ll.gameserver.repository.AuthTokenRepository;
+import com.fluffb4ll.gameserver.repository.PlayerRepository;
 import com.fluffb4ll.gameserver.util.RegexValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;

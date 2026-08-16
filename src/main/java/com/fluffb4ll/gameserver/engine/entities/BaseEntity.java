@@ -1,25 +1,20 @@
-package com.fluffb4ll.gameserver.model.terrains;
+package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.util.Vector2D;
-import com.fluffb4ll.gameserver.util.AtomicFloat;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Terrain {
+/**
+ * Defines a basic entity
+ */
+public abstract class BaseEntity {
     private final UUID id;
-    private final String displayName;
     private Vector2D position;
-    private final AtomicFloat radius;
 
-    public Terrain(UUID id,
-                   String displayName,
-                   Vector2D position,
-                   float radius) {
+    public BaseEntity(UUID id, Vector2D position) {
         this.id = id;
-        this.displayName = displayName;
         this.position = position;
-        this.radius = new AtomicFloat(radius);
     }
 
     public Vector2D getPosition() {
@@ -28,10 +23,6 @@ public abstract class Terrain {
 
     public UUID getUuid() {
         return id;
-    }
-
-    public float getRadius() {
-        return radius.floatValue();
     }
 
     protected synchronized void setPosition(Vector2D position) {
@@ -46,7 +37,7 @@ public abstract class Terrain {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        Terrain that = (Terrain) o;
+        BaseEntity that = (BaseEntity) o;
         return Objects.equals(id, that.id);
     }
 

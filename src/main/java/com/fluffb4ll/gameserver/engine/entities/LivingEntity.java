@@ -1,11 +1,10 @@
-package com.fluffb4ll.gameserver.model.entities;
+package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.engine.MovementValidator;
+import com.fluffb4ll.gameserver.util.MovementValidator;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
-import com.fluffb4ll.gameserver.util.WorldLogger;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;

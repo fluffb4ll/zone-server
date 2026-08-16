@@ -1,6 +1,6 @@
-package com.fluffb4ll.gameserver.model.database.repositories;
+package com.fluffb4ll.gameserver.repository;
 
-import com.fluffb4ll.gameserver.model.database.entities.PlayerEntity;
+import com.fluffb4ll.gameserver.entity.PlayerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

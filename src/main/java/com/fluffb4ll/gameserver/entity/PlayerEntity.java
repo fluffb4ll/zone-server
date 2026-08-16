@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.model.database.entities;
+package com.fluffb4ll.gameserver.entity;
 
 import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;

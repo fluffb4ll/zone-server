@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.engine.configs;
+package com.fluffb4ll.gameserver.config;
 
 import com.fluffb4ll.gameserver.util.PepperedBCryptEncoder;
 import org.springframework.beans.factory.annotation.Value;
