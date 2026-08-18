@@ -1,6 +1,7 @@
 package com.fluffb4ll.gameserver.engine;
 
 import com.fluffb4ll.gameserver.engine.entities.*;
+import com.fluffb4ll.gameserver.handler.WebSocketHandler;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
 import com.fluffb4ll.gameserver.engine.terrains.SpawnerTerrain;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -78,7 +80,6 @@ public class WorldManager {
 
         MapChunk newChunk = getChunkByPosition(newPos);
 
-
         if (newChunk == null) {
             handleOutOfBoundsTravel(entity);
             return;
@@ -142,5 +143,34 @@ public class WorldManager {
             case SpawnerTerrain spawner -> chunk.addSpawner(spawner);
             default -> {}
         }
+    }
+
+    public List<MapChunk> getNearbyChunks(LivingEntity entity) {
+        Vector2D pos = entity.getPosition();
+        List<MapChunk> chunks = new ArrayList<>();
+        for (int dx = -1; dx <= 1; dx++)
+            for (int dy = -1; dy <= 1; dy++)
+                chunks.add(getChunkByPosition(new Vector2D(
+                        pos.x + CHUNK_SIZE * dx,
+                        pos.y + CHUNK_SIZE * dy
+                )));
+        return chunks;
+    }
+
+    public LivingEntity findLivingEntityInNearbyChunks(Player player, UUID id) {
+        List<MapChunk> nearbyChunks = getNearbyChunks(player);
+        if (nearbyChunks.isEmpty())
+            return null;
+
+        for (MapChunk chunk : nearbyChunks) {
+            LivingEntity found = chunk.getAllEntitiesStream()
+                    .filter(e -> e.getUuid().equals(id))
+                    .findFirst()
+                    .orElse(null);
+            if (found != null)
+                return found;
+        }
+
+        return null;
     }
 }

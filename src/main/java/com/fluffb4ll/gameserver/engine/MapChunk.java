@@ -74,7 +74,7 @@ public class MapChunk {
         return Collections.unmodifiableSet(spawners);
     }
 
-    public Stream<BaseEntity> getAllEntitiesStream() {
+    public Stream<LivingEntity> getAllEntitiesStream() {
         return Stream.concat(players.stream(),
                 Stream.concat(mutants.stream(), anomalies.stream())
         );
@@ -134,9 +134,11 @@ public class MapChunk {
     public void tick(long tickCount, boolean shouldLogStatus, float deltaTime, WorldManager worldManager) {
         if ((!anomalies.isEmpty() || !mutants.isEmpty()) && shouldLogStatus)
             WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y), mutants.size(), anomalies.size());
+
         tickAnomalies(deltaTime);
         tickMutants(deltaTime, worldManager);
         tickSpawners(deltaTime);
+
         resolveCollisions();
         cleanUpDeadEntities();
     }
