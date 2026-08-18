@@ -52,4 +52,12 @@ public class PlayerAuthService {
         playerRepository.save(player);
         return player.getId();
     }
+
+    @Transactional
+    public boolean verifyAuthToken(UUID playerId, UUID recievedAT) {
+        UUID storedAT = tokenRepository.findTokenById(playerId).orElse(null);
+        if (storedAT == null)
+            return false;
+        return storedAT.equals(recievedAT);
+    }
 }

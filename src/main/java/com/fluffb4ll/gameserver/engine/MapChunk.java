@@ -154,6 +154,7 @@ public class MapChunk {
                 continue;
             mutant.updateAI(deltaTime);
             Vector2D newPos = mutant.calculateNextPosition(deltaTime);
+            // TODO: мутант должен двигаться сам
             worldManager.moveEntity(mutant, this, newPos);
         }
     }

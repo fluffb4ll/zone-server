@@ -53,6 +53,12 @@ public class GameLoop {
 
             AtomicInteger submittedTasks = new AtomicInteger(0);
 
+            worldManager.getPlayers().forEach(player -> {
+                chunkWorkerPool.submit(() -> {
+                    player.processInboundQueue(worldManager);
+                });
+            });
+
             worldManager.getAllChunks().forEach(chunk -> {
                 if (shouldTickChunk(chunk)) {
                     submittedTasks.incrementAndGet();

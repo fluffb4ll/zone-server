@@ -3,8 +3,10 @@ package com.fluffb4ll.gameserver.handler;
 import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
 import com.fluffb4ll.gameserver.engine.entities.Player;
+import com.fluffb4ll.gameserver.engine.factories.PlayerFactory;
 import com.fluffb4ll.gameserver.model.records.AttackCommand;
 import com.fluffb4ll.gameserver.model.records.MoveCommand;
+import com.fluffb4ll.gameserver.service.PlayerAuthService;
 import com.fluffb4ll.gameserver.util.ByteParser;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,8 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -22,22 +26,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler extends BinaryWebSocketHandler {
     private final Map<UUID, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final WorldManager worldManager;
+    private final PlayerAuthService authService;
+    private final PlayerFactory factory;
 
     // опкоды
+    private final byte OP_AUTH = 0x00;
     private final byte OP_MOVE = 0x01;
     private final byte OP_ATTACK = 0x02;
 
-    public WebSocketHandler(WorldManager worldManager) {
+    public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory) {
         this.worldManager = worldManager;
+        this.authService = authService;
+        this.factory = factory;
     }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
         Player player = (Player) session.getAttributes().get("player");
+        if (!(boolean) session.getAttributes().get("isAuthenticated")) {
+            handlePlayerLogin(session, message);
+            return;
+        }
         if (player == null)
             return;
 
         ByteBuffer buffer = message.getPayload();
+        if (buffer.limit() == 0)
+            return;
+
         byte opcode = buffer.get();
 
         switch (opcode) {
@@ -50,28 +66,44 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         UUID id = extractPlayerId(session);
-        sessions.put(id, session);
-        // TODO: заспавнить игрока в мире на его предыдущей позиции, подгрузив данные из бд,
-        //  отправить его данные обратно
-        // Player player = ...
-        // session.getAttributes().put("player", player);
+        WebSocketSession threadSafeSesh =
+                new ConcurrentWebSocketSessionDecorator(session, 5000, 8192);
+        sessions.put(id, threadSafeSesh);
+        session.getAttributes().put("isAuthenticated", false);
+        session.getAttributes().put("id", id);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        UUID id = extractPlayerId(session);
+        if (Boolean.FALSE.equals(session.getAttributes().get("isAuthenticated")))
+            return;
+        UUID id = ((Player) session.getAttributes().get("player")).getUuid();
         sessions.remove(id);
-        //worldManager.removePlayer(id);
+        worldManager.removePlayer(id);
     }
 
     // дёргает айдишник из query (параметр id)
     private UUID extractPlayerId(WebSocketSession session) {
-        char[] query = session.getUri().getQuery().toCharArray();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 3; i < 39; i++) {
-            sb.append(query[i]);
+        String query = session.getUri().getQuery();
+        return UUID.fromString(UriComponentsBuilder.fromUri(session.getUri())
+                .build().getQueryParams().getFirst("id"));
+    }
+
+    private void handlePlayerLogin(WebSocketSession session, BinaryMessage message) {
+        try {
+            ByteBuffer buffer = message.getPayload();
+            byte opcode = buffer.get();
+            UUID token = ByteParser.parseUUID(buffer);
+            UUID playerId = (UUID) session.getAttributes().get("id");
+            if (opcode != OP_AUTH || !authService.verifyAuthToken(playerId, token))
+                session.close();
+
+            Player player = factory.spawn(playerId);
+            session.getAttributes().put("isAuthenticated", true);
+            session.getAttributes().put("player", player);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return UUID.fromString(sb.toString());
     }
 
     private void handleMovePacket(Player player, ByteBuffer buffer) {
@@ -84,9 +116,9 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     private void handleAttackPacket(Player player, ByteBuffer buffer) {
         long packetId = buffer.getLong();
-        UUID targetId = ByteParser.parseUUID(buffer);
-        LivingEntity target = worldManager.findLivingEntityInNearbyChunks(player, targetId);
-        if (target != null)
-            player.addToInboundQueue(new AttackCommand(packetId, target));
+        try {
+            UUID targetId = ByteParser.parseUUID(buffer);
+            player.addToInboundQueue(new AttackCommand(packetId, targetId));
+        } catch (IllegalArgumentException e) { throw new IllegalArgumentException(e); }
     }
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WorldManager {
     private final Map<ChunkCoordinate, MapChunk> chunks = new ConcurrentHashMap<>();
+    private final Map<UUID, Player> players = new ConcurrentHashMap<>();
 
     // TODO: вынести в отдельный конфиг
     // размер чанка в юнитах
@@ -49,6 +50,7 @@ public class WorldManager {
                 chunks.put(coordinate, chunk);
             }
 
+        // TODO: переписать в логгер
         System.out.println("Карта успешно инициализирована. Заселено чанков: "
                 + (WORLD_HEIGHT_IN_CHUNKS * WORLD_WIDTH_IN_CHUNKS)
         );
@@ -68,6 +70,30 @@ public class WorldManager {
         return chunks.get(new ChunkCoordinate(cx, cy));
     }
 
+    public List<Player> getPlayers() {
+        return new ArrayList<>(players.values());
+    }
+
+    public boolean addPlayer(Player player) {
+        return players.put(player.getUuid(), player) == null;
+    }
+
+    public boolean removePlayer(Player player) {
+        return removePlayer(player.getUuid());
+    }
+
+    // TODO: заменить на подписку на ивент дисконнекта (в чанке в т.ч.)
+    public boolean removePlayer(UUID uuid) {
+        if (!players.containsKey(uuid))
+            return false;
+
+        Player player = players.get(uuid);
+        getChunkByPosition(player.getPosition()).removePlayer(player);
+
+        players.remove(uuid);
+        return true;
+    }
+
     /**
      * Перемещает сущность из старого чанка в новый на основе её новых координат.
      * @param entity Сущность, которую нужно переместить
@@ -75,6 +101,7 @@ public class WorldManager {
      * @param newPos Новая позиция сущности
      */
     public void moveEntity(LivingEntity entity, MapChunk currChunk, Vector2D newPos) {
+        // TODO: переписать под EventBus?
         if (currChunk.contains(newPos) && entity.move(newPos))
             return;
 
@@ -129,7 +156,10 @@ public class WorldManager {
         switch (entity) {
             case Mutant mutant -> chunk.addMutant(mutant);
             case Anomaly anomaly -> chunk.addAnomaly(anomaly);
-            case Player player -> chunk.addPlayer(player);
+            case Player player ->  {
+                players.put(player.getUuid(), player);
+                chunk.addPlayer(player);
+            }
             default -> {}
         }
     }

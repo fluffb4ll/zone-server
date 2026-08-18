@@ -22,6 +22,9 @@ public class PlayerEntity {
     @Column(name = "nickname", length = 16, nullable = false, unique = true)
     private String nickname;
 
+    @Column(name = "has_played_before")
+    private boolean hasPlayedBefore;
+
     @Column(name = "max_health")
     private int maxHealth;
 
@@ -41,7 +44,8 @@ public class PlayerEntity {
                         String nickname,
                         int maxHealth,
                         int currHealth,
-                        Vector2D pos)
+                        Vector2D pos,
+                        boolean hasPlayedBefore)
     {
         this.id = id;
         this.password = password;
@@ -50,6 +54,7 @@ public class PlayerEntity {
         this.currHealth = currHealth;
         posX = pos.x;
         posY = pos.y;
+        this.hasPlayedBefore = hasPlayedBefore;
     }
 
     public PlayerEntity(String password,
@@ -107,5 +112,13 @@ public class PlayerEntity {
     public void setPos(Vector2D pos) {
         posX = pos.x;
         posY = pos.y;
+    }
+
+    public boolean hasPlayedBefore() {
+        return hasPlayedBefore;
+    }
+
+    public void setHasPlayedBefore(boolean hasPlayedBefore) {
+        this.hasPlayedBefore = hasPlayedBefore;
     }
 }
