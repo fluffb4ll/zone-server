@@ -42,6 +42,10 @@ public class Player extends LivingEntity {
         setHealth(currHealth);
     }
 
+    public long getLastProcessedPacketId() {
+        return lastProcessedPacketId.get();
+    }
+
     public Queue<PlayerCommand> getInboundQueue() {
         return inboundQueue;
     }
