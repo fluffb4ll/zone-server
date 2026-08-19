@@ -203,4 +203,16 @@ public class WorldManager {
 
         return null;
     }
+
+    public List<LivingEntity> findLivingEntitiesInNearbyChunks(Player player) {
+        List<MapChunk> nearbyChunks = getNearbyChunks(player);
+        if (nearbyChunks.isEmpty())
+            return null;
+
+        List<LivingEntity> entities = new ArrayList<>();
+        for (MapChunk chunk : nearbyChunks)
+            entities.addAll(chunk.getAllEntitiesStream().toList());
+
+        return entities;
+    }
 }

@@ -1,9 +1,17 @@
 package com.fluffb4ll.gameserver.engine;
 
+import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
+import com.fluffb4ll.gameserver.engine.entities.Player;
+import com.fluffb4ll.gameserver.handler.WebSocketHandler;
+import com.fluffb4ll.gameserver.util.PacketEncoder;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,6 +21,7 @@ public class GameLoop {
     private static final int TICK_RATE = 20;
 
     private final WorldManager worldManager;
+    private final WebSocketHandler wsHandler;
 
     // ритм сервера
     private final ScheduledExecutorService heartbeat = Executors.newSingleThreadScheduledExecutor();
@@ -31,8 +40,9 @@ public class GameLoop {
 
     private long tickCount = 0;
 
-    public GameLoop(WorldManager worldManager) {
+    public GameLoop(WorldManager worldManager, WebSocketHandler wsHandler) {
         this.worldManager = worldManager;
+        this.wsHandler = wsHandler;
     }
 
     public void start() {
@@ -45,37 +55,68 @@ public class GameLoop {
             tickCount++;
 
             // логгируем заголовок тика раз в секунду, чтобы не засирать консоль
-            boolean isSecondTick = (tickCount % TICK_RATE == 0);
-            if (isSecondTick) {
+            boolean shouldLogTick = (tickCount % TICK_RATE == 0);
+            if (shouldLogTick) {
                 WorldLogger.logTickHeader(tickCount);
                 worldManager.updateChunkLODs();
             }
 
-            AtomicInteger submittedTasks = new AtomicInteger(0);
+            // обработка очереди пакетов
+            processPlayerPackets();
 
-            worldManager.getPlayers().forEach(player -> {
-                chunkWorkerPool.submit(() -> {
-                    player.processInboundQueue(worldManager);
-                });
-            });
+            // обработка чанков
+            int submittedTasks = tickChunks(shouldLogTick);
 
-            worldManager.getAllChunks().forEach(chunk -> {
-                if (shouldTickChunk(chunk)) {
-                    submittedTasks.incrementAndGet();
-                    chunkWorkerPool.submit(() -> {
-                        // проверяем, какой именно поток забрал чанк в работу
-                        // System.out.printf("[%s] Processing chunk %s%n", Thread.currentThread().getName(), chunk.getCoords());
-                        chunk.tick(tickCount, isSecondTick, 1f / TICK_RATE, worldManager);
-                    });
-                }
-            });
+            // отправка пакетов игрокам
+            broadcastWorldState();
 
-            if (isSecondTick && submittedTasks.get() == 0) {
+            if (shouldLogTick && submittedTasks == 0) {
                 System.out.println("[GameLoop]: Нет активных чанков для обработки (все в SLEEPING или карту не заселили).");
             }
 
         } catch (Exception e) {
             System.err.format("[GameLoop]: Ошибка при выполнении тика номер %d: %s%n", tickCount, e.getMessage());
+        }
+    }
+
+    private void processPlayerPackets() {
+        worldManager.getPlayers().forEach(player -> {
+            chunkWorkerPool.submit(() -> {
+                player.processInboundQueue(worldManager);
+            });
+        });
+    }
+
+    private int tickChunks(boolean shouldLogTick) {
+        AtomicInteger submittedTasks = new AtomicInteger(0);
+
+        worldManager.getAllChunks().forEach(chunk -> {
+            if (shouldTickChunk(chunk)) {
+                submittedTasks.incrementAndGet();
+                chunkWorkerPool.submit(() -> {
+                    // проверяем, какой именно поток забрал чанк в работу
+                    // System.out.printf("[%s] Processing chunk %s%n", Thread.currentThread().getName(), chunk.getCoords());
+                    chunk.tick(tickCount, shouldLogTick, 1f / TICK_RATE, worldManager);
+                });
+            }
+        });
+
+        return submittedTasks.get();
+    }
+
+    private void broadcastWorldState() {
+        for (Player player : worldManager.getPlayers()) {
+            WebSocketSession session = wsHandler.getSessions().get(player.getUuid());
+
+            List<LivingEntity> visibleEntities = worldManager.findLivingEntitiesInNearbyChunks(player);
+
+            byte[] snapshotData = PacketEncoder.createWorldSnapshot(player, visibleEntities);
+
+            try {
+                session.sendMessage(new BinaryMessage(snapshotData));
+            } catch (IOException _) {
+                wsHandler.addDeadSession(player.getUuid());
+            }
         }
     }
 

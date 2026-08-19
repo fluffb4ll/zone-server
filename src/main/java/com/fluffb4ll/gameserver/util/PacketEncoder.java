@@ -35,7 +35,7 @@ public class PacketEncoder {
 
             buffer.putInt(entity.getHealth());
         }
-        
+
         return buffer.array();
     }
 }
