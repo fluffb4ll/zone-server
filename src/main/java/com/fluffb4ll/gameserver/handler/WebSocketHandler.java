@@ -43,12 +43,10 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
         Player player = (Player) session.getAttributes().get("player");
-        if (!(boolean) session.getAttributes().get("isAuthenticated")) {
+        if (player == null) {
             handlePlayerLogin(session, message);
             return;
         }
-        if (player == null)
-            return;
 
         ByteBuffer buffer = message.getPayload();
         if (buffer.limit() == 0)
@@ -69,15 +67,15 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
         WebSocketSession threadSafeSesh =
                 new ConcurrentWebSocketSessionDecorator(session, 5000, 8192);
         sessions.put(id, threadSafeSesh);
-        session.getAttributes().put("isAuthenticated", false);
         session.getAttributes().put("id", id);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        if (Boolean.FALSE.equals(session.getAttributes().get("isAuthenticated")))
+        Player player = (Player) session.getAttributes().get("player");
+        if (player == null)
             return;
-        UUID id = ((Player) session.getAttributes().get("player")).getUuid();
+        UUID id = player.getUuid();
         sessions.remove(id);
         worldManager.removePlayer(id);
     }
@@ -99,7 +97,6 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
                 session.close();
 
             Player player = factory.spawn(playerId);
-            session.getAttributes().put("isAuthenticated", true);
             session.getAttributes().put("player", player);
         } catch (Exception e) {
             throw new RuntimeException(e);
