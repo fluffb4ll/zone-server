@@ -16,7 +16,10 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebSocketHandler extends BinaryWebSocketHandler {
     private final Map<UUID, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final List<UUID> deadSessions = new ArrayList<>();
     private final WorldManager worldManager;
     private final PlayerAuthService authService;
     private final PlayerFactory factory;
@@ -66,6 +70,12 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         UUID id = extractPlayerId(session);
+        if (id == null)
+            try {
+                session.close();
+                return;
+            } catch (IOException _) {}
+
         WebSocketSession threadSafeSesh =
                 new ConcurrentWebSocketSessionDecorator(session, 5000, 8192);
         sessions.put(id, threadSafeSesh);
@@ -85,23 +95,29 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     // дёргает айдишник из query (параметр id)
     private UUID extractPlayerId(WebSocketSession session) {
         String query = session.getUri().getQuery();
-        return UUID.fromString(UriComponentsBuilder.fromUri(session.getUri())
-                .build().getQueryParams().getFirst("id"));
+        String id = UriComponentsBuilder.fromUri(session.getUri())
+                .build().getQueryParams().getFirst("id");
+
+        if (id == null)
+            return null;
+        return UUID.fromString(id);
     }
 
     private void handlePlayerLogin(WebSocketSession session, BinaryMessage message) {
+        UUID playerId = (UUID) session.getAttributes().get("id");
+
         try {
             ByteBuffer buffer = message.getPayload();
             byte opcode = buffer.get();
             UUID token = ByteParser.parseUUID(buffer);
-            UUID playerId = (UUID) session.getAttributes().get("id");
+
             if (opcode != C2S_OP_AUTH || !authService.verifyAuthToken(playerId, token))
                 session.close();
 
             Player player = factory.spawn(playerId);
             session.getAttributes().put("player", player);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception _) {
+            addDeadSession(playerId);
         }
     }
 
@@ -123,5 +139,18 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     public Map<UUID, WebSocketSession> getSessions() {
         return Map.copyOf(sessions);
+    }
+
+    public void addDeadSession(UUID sessionId) {
+        deadSessions.add(sessionId);
+    }
+
+    public void closeDeadSessions() {
+        for (UUID id : deadSessions) {
+            WebSocketSession session = sessions.remove(id);
+            try {
+                session.close();
+            } catch (IOException _) {}
+        }
     }
 }
