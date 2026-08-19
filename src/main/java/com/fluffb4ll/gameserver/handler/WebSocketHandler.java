@@ -1,7 +1,6 @@
 package com.fluffb4ll.gameserver.handler;
 
 import com.fluffb4ll.gameserver.engine.WorldManager;
-import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
 import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.engine.factories.PlayerFactory;
 import com.fluffb4ll.gameserver.model.records.AttackCommand;
@@ -29,10 +28,13 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     private final PlayerAuthService authService;
     private final PlayerFactory factory;
 
-    // опкоды
-    private final byte OP_AUTH = 0x00;
-    private final byte OP_MOVE = 0x01;
-    private final byte OP_ATTACK = 0x02;
+    // опкоды C2S пакетов
+    private final byte C2S_OP_AUTH = 0x00;
+    private final byte C2S_OP_MOVE = 0x01;
+    private final byte C2S_OP_ATTACK = 0x02;
+
+    // опкоды S2C пакетов
+    public static final byte S2C_OP_WORLD_SNAPSHOT = 0x10;
 
     public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory) {
         this.worldManager = worldManager;
@@ -55,8 +57,8 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
         byte opcode = buffer.get();
 
         switch (opcode) {
-            case OP_MOVE -> handleMovePacket(player, buffer);
-            case OP_ATTACK -> handleAttackPacket(player, buffer);
+            case C2S_OP_MOVE -> handleMovePacket(player, buffer);
+            case C2S_OP_ATTACK -> handleAttackPacket(player, buffer);
             default -> System.err.println("Unknown opcode: " + opcode);
         }
     }
@@ -93,7 +95,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
             byte opcode = buffer.get();
             UUID token = ByteParser.parseUUID(buffer);
             UUID playerId = (UUID) session.getAttributes().get("id");
-            if (opcode != OP_AUTH || !authService.verifyAuthToken(playerId, token))
+            if (opcode != C2S_OP_AUTH || !authService.verifyAuthToken(playerId, token))
                 session.close();
 
             Player player = factory.spawn(playerId);
@@ -117,5 +119,9 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
             UUID targetId = ByteParser.parseUUID(buffer);
             player.addToInboundQueue(new AttackCommand(packetId, targetId));
         } catch (IllegalArgumentException e) { throw new IllegalArgumentException(e); }
+    }
+
+    public Map<UUID, WebSocketSession> getSessions() {
+        return Map.copyOf(sessions);
     }
 }
