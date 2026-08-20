@@ -11,7 +11,6 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,11 +107,11 @@ public class GameLoop {
         List<Player> players = worldManager.getPlayers();
         if (players.isEmpty()) { return; }
 
-        List<CompletableFuture<Void>> tasks = players.stream()
-                .map((player) -> CompletableFuture.runAsync(() -> processBroadcast(player), workerPool))
-                .toList();
-
-        CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (Player player : players) {
+                executor.submit(() -> processBroadcast(player));
+            }
+        }
     }
 
     private void processBroadcast(Player player) {
