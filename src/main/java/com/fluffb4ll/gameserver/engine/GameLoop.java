@@ -11,6 +11,7 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,8 +28,8 @@ public class GameLoop {
     private final ScheduledExecutorService heartbeat = Executors.newSingleThreadScheduledExecutor();
 
     // кастомный тред-пул с понятными именами потоков для удобства отладки
-    private final ExecutorService chunkWorkerPool = Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
+    private final ExecutorService workerPool = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() - 2,
             new ThreadFactory() {
                 private final AtomicInteger threadNumber = new AtomicInteger(1);
                 @Override
@@ -80,43 +81,51 @@ public class GameLoop {
     }
 
     private void processPlayerPackets() {
-        worldManager.getPlayers().forEach(player -> {
-            chunkWorkerPool.submit(() -> {
-                player.processInboundQueue(worldManager);
-            });
-        });
+        List<CompletableFuture<Void>> tasks = worldManager.getPlayers().stream()
+                .map(
+                        player -> CompletableFuture.runAsync(
+                                () -> player.processInboundQueue(worldManager), workerPool))
+                .toList();
+
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
     }
 
     private int tickChunks(boolean shouldLogTick) {
-        AtomicInteger submittedTasks = new AtomicInteger(0);
+        List<MapChunk> activeChunks = worldManager.getAllChunks().stream()
+                .filter(this::shouldTickChunk)
+                .toList();
 
-        worldManager.getAllChunks().forEach(chunk -> {
-            if (shouldTickChunk(chunk)) {
-                submittedTasks.incrementAndGet();
-                chunkWorkerPool.submit(() -> {
-                    // проверяем, какой именно поток забрал чанк в работу
-                    // System.out.printf("[%s] Processing chunk %s%n", Thread.currentThread().getName(), chunk.getCoords());
-                    chunk.tick(tickCount, shouldLogTick, 1f / TICK_RATE, worldManager);
-                });
-            }
-        });
+        List<CompletableFuture<Void>> tasks = activeChunks.stream()
+                .map(chunk -> CompletableFuture.runAsync(
+                        () -> chunk.tick(tickCount, shouldLogTick, 1f / TICK_RATE, worldManager), workerPool))
+                .toList();
 
-        return submittedTasks.get();
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
+        return activeChunks.size();
     }
 
     private void broadcastWorldState() {
-        for (Player player : worldManager.getPlayers()) {
-            WebSocketSession session = wsHandler.getSessions().get(player.getUuid());
+        List<Player> players = worldManager.getPlayers();
+        if (players.isEmpty()) { return; }
 
-            List<LivingEntity> visibleEntities = worldManager.findLivingEntitiesInNearbyChunks(player);
+        List<CompletableFuture<Void>> tasks = players.stream()
+                .map((player) -> CompletableFuture.runAsync(() -> processBroadcast(player), workerPool))
+                .toList();
 
-            byte[] snapshotData = PacketEncoder.createWorldSnapshot(player, visibleEntities);
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).join();
+    }
 
-            try {
-                session.sendMessage(new BinaryMessage(snapshotData));
-            } catch (IOException _) {
-                wsHandler.addDeadSession(player.getUuid());
-            }
+    private void processBroadcast(Player player) {
+        WebSocketSession session = wsHandler.getSessions().get(player.getUuid());
+
+        List<LivingEntity> visibleEntities = worldManager.findLivingEntitiesInNearbyChunks(player);
+
+        byte[] snapshotData = PacketEncoder.createWorldSnapshot(player, visibleEntities);
+
+        try {
+            session.sendMessage(new BinaryMessage(snapshotData));
+        } catch (IOException _) {
+            wsHandler.addDeadSession(player.getUuid());
         }
     }
 
@@ -131,6 +140,6 @@ public class GameLoop {
     @PreDestroy
     private void stop() {
         heartbeat.shutdown();
-        chunkWorkerPool.shutdown();
+        workerPool.shutdown();
     }
 }
