@@ -3,8 +3,8 @@ package com.fluffb4ll.gameserver.handler;
 import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.engine.factories.PlayerFactory;
-import com.fluffb4ll.gameserver.model.records.AttackCommand;
-import com.fluffb4ll.gameserver.model.records.MoveCommand;
+import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
+import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
 import com.fluffb4ll.gameserver.service.PlayerAuthService;
 import com.fluffb4ll.gameserver.util.ByteParser;
 import com.fluffb4ll.gameserver.util.Vector2D;
@@ -39,6 +39,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     // опкоды S2C пакетов
     public static final byte S2C_OP_WORLD_SNAPSHOT = 0x10;
+    public static final byte S2C_OP_ENTITY_DEATH = 0x11;
 
     public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory) {
         this.worldManager = worldManager;
@@ -94,7 +95,6 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     // дёргает айдишник из query (параметр id)
     private UUID extractPlayerId(WebSocketSession session) {
-        String query = session.getUri().getQuery();
         String id = UriComponentsBuilder.fromUri(session.getUri())
                 .build().getQueryParams().getFirst("id");
 

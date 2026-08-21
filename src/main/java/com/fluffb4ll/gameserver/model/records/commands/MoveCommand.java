@@ -1,4 +1,4 @@
-package com.fluffb4ll.gameserver.model.records;
+package com.fluffb4ll.gameserver.model.records.commands;
 
 import com.fluffb4ll.gameserver.util.Vector2D;
 

@@ -1,6 +1,4 @@
-package com.fluffb4ll.gameserver.model.records;
-
-import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
+package com.fluffb4ll.gameserver.model.records.commands;
 
 import java.util.UUID;
 

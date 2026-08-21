@@ -1,12 +1,15 @@
 package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.engine.MapChunk;
 import com.fluffb4ll.gameserver.engine.WorldManager;
-import com.fluffb4ll.gameserver.model.records.PlayerCommand;
-import com.fluffb4ll.gameserver.model.records.AttackCommand;
-import com.fluffb4ll.gameserver.model.records.MoveCommand;
+import com.fluffb4ll.gameserver.model.records.commands.PlayerCommand;
+import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
+import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
 import com.fluffb4ll.gameserver.util.Vector2D;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -18,6 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Player extends LivingEntity {
     private final AtomicLong lastProcessedPacketId = new AtomicLong(0);
     private final Queue<PlayerCommand> inboundQueue = new ConcurrentLinkedQueue<>();
+    private final Queue<byte[]> outboundEventsQueue = new ConcurrentLinkedQueue<>();
+    private final List<MapChunk> listenedChunks = new ArrayList<>();
 
     public Player(UUID id,
                   Vector2D position,
@@ -78,5 +83,13 @@ public class Player extends LivingEntity {
         LivingEntity target = worldManager.findLivingEntityInNearbyChunks(this, command.targetId());
         if (target != null)
             target.takeDamage(getDamage());
+    }
+
+    public Queue<byte[]> getOutboundEventsQueue() {
+        return outboundEventsQueue;
+    }
+
+    public void addToOutboundQueue(byte[] packet) {
+        outboundEventsQueue.add(packet);
     }
 }

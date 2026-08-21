@@ -12,6 +12,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -68,7 +69,7 @@ public class GameLoop {
             int submittedTasks = tickChunks(shouldLogTick);
 
             // отправка пакетов игрокам
-            broadcastWorldState();
+            broadcastData();
 
             if (shouldLogTick && submittedTasks == 0) {
                 System.out.println("[GameLoop]: Нет активных чанков для обработки (все в SLEEPING или карту не заселили).");
@@ -103,7 +104,7 @@ public class GameLoop {
         return activeChunks.size();
     }
 
-    private void broadcastWorldState() {
+    private void broadcastData() {
         List<Player> players = worldManager.getPlayers();
         if (players.isEmpty()) { return; }
 
@@ -112,13 +113,27 @@ public class GameLoop {
                 executor.submit(() -> processBroadcast(player));
             }
         }
+
+        wsHandler.closeDeadSessions();
     }
 
     private void processBroadcast(Player player) {
         WebSocketSession session = wsHandler.getSessions().get(player.getUuid());
 
+        // вывод ивентов
+        Queue<byte[]> outputQueue = player.getOutboundEventsQueue();
+        while (!outputQueue.isEmpty())
+            try {
+                byte[] packet = outputQueue.poll();
+                session.sendMessage(new BinaryMessage(packet));
+            } catch (IOException _) {
+                wsHandler.addDeadSession(player.getUuid());
+                return;
+            }
+
         List<LivingEntity> visibleEntities = worldManager.findLivingEntitiesInNearbyChunks(player);
 
+        // вывод снапшота
         byte[] snapshotData = PacketEncoder.createWorldSnapshot(player, visibleEntities);
 
         try {

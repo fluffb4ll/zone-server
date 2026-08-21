@@ -3,6 +3,7 @@ package com.fluffb4ll.gameserver.util;
 import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
 import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.handler.WebSocketHandler;
+import com.fluffb4ll.gameserver.model.records.events.EntityDeathEvent;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -35,6 +36,21 @@ public class PacketEncoder {
 
             buffer.putInt(entity.getHealth());
         }
+
+        return buffer.array();
+    }
+
+    /** <p>Формирует тело пакета для отправки {@code EntityDeathEvent} выбранному игроку</p>
+     * <p>Тело пакета:<br>
+     * 1. Опкод (1 байт)
+     * 2. UUID сущности (16 байт)</p>*/
+    public static byte[] encodeDeathEvent(EntityDeathEvent event) {
+        int packetSize = 1 + 16;
+        ByteBuffer buffer = ByteBuffer.allocate(packetSize);
+
+        buffer.put(WebSocketHandler.S2C_OP_ENTITY_DEATH);
+        buffer.putLong(event.uuid().getMostSignificantBits());
+        buffer.putLong(event.uuid().getLeastSignificantBits());
 
         return buffer.array();
     }

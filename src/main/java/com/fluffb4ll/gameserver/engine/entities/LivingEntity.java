@@ -3,7 +3,7 @@ package com.fluffb4ll.gameserver.engine.entities;
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.util.MovementValidator;
 import com.fluffb4ll.gameserver.util.Vector2D;
-import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
+import com.fluffb4ll.gameserver.model.records.events.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.AtomicFloat;
 
 import java.util.UUID;
@@ -90,7 +90,7 @@ public abstract class LivingEntity extends BaseEntity {
         if (hp > 0)
             return;
         this.health.set(0);
-        eventBus.publish(new EntityDeathEvent(getUuid()));
+        eventBus.publish(new EntityDeathEvent(getUuid(), getPosition()));
     }
 
     public synchronized void heal(int healAmount) {

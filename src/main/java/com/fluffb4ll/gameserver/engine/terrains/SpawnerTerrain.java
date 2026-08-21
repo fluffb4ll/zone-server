@@ -2,7 +2,7 @@ package com.fluffb4ll.gameserver.engine.terrains;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
-import com.fluffb4ll.gameserver.model.records.EntityDeathEvent;
+import com.fluffb4ll.gameserver.model.records.events.EntityDeathEvent;
 import com.fluffb4ll.gameserver.util.Vector2D;
 
 import java.util.List;

@@ -175,16 +175,23 @@ public class WorldManager {
         }
     }
 
-    public List<MapChunk> getNearbyChunks(LivingEntity entity) {
-        Vector2D pos = entity.getPosition();
+    public List<MapChunk> getNearbyChunks(Vector2D pos) {
         List<MapChunk> chunks = new ArrayList<>();
         for (int dx = -1; dx <= 1; dx++)
-            for (int dy = -1; dy <= 1; dy++)
-                chunks.add(getChunkByPosition(new Vector2D(
+            for (int dy = -1; dy <= 1; dy++) {
+                var chunk = getChunkByPosition(new Vector2D(
                         pos.x + CHUNK_SIZE * dx,
                         pos.y + CHUNK_SIZE * dy
-                )));
+                ));
+                if (chunk != null)
+                    chunks.add(chunk);
+            }
+
         return chunks;
+    }
+
+    public List<MapChunk> getNearbyChunks(LivingEntity entity) {
+        return getNearbyChunks(entity.getPosition());
     }
 
     public LivingEntity findLivingEntityInNearbyChunks(Player player, UUID id) {
