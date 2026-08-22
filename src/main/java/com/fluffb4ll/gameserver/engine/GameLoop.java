@@ -120,6 +120,7 @@ public class GameLoop {
     private void processBroadcast(Player player) {
         WebSocketSession session = wsHandler.getSessions().get(player.getUuid());
 
+        // TODO: объединить ивенты и снапшот в один пакет?
         // вывод ивентов
         Queue<byte[]> outputQueue = player.getOutboundEventsQueue();
         while (!outputQueue.isEmpty())

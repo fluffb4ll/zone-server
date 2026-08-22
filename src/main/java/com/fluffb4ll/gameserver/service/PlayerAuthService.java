@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,7 +27,7 @@ public class PlayerAuthService {
     }
 
     @Transactional
-    public UUID login(String nickname, String rawPassword) throws SecurityException {
+    public List<UUID> login(String nickname, String rawPassword) throws SecurityException {
         PlayerEntity player = playerRepository.findByNickname(nickname)
                 .orElseThrow(() -> new SecurityException("Wrong credentials"));
         if (!passEncoder.matches(rawPassword, player.getPassword()))
@@ -35,17 +36,19 @@ public class PlayerAuthService {
         UUID token = UUID.randomUUID();
         AuthTokenEntity authTokenEntity = new AuthTokenEntity(player.getId(), token);
         tokenRepository.save(authTokenEntity);
-        return token;
+        return List.of(player.getId(), token);
     }
 
     @Transactional
     public UUID signup(String nickname, String rawPassword) {
         if (!RegexValidator.isValidPassword(rawPassword))
             throw new SecurityException(
-                    "Invalid password. Password must be at least 8 characters long and contain" +
+                    "Invalid password. Password must be at least 8 characters long and contain " +
                     "digits and Latin letters");
         if (!RegexValidator.isValidNickname(nickname))
             throw new SecurityException("Invalid nickname");
+        if (playerRepository.findByNickname(nickname).isPresent())
+            throw new SecurityException("Player already exists");
 
         String encodedPassword = passEncoder.encode(rawPassword);
         PlayerEntity player = new PlayerEntity(encodedPassword, nickname);
@@ -54,10 +57,10 @@ public class PlayerAuthService {
     }
 
     @Transactional
-    public boolean verifyAuthToken(UUID playerId, UUID recievedAT) {
+    public boolean verifyAuthToken(UUID playerId, UUID receivedAT) {
         UUID storedAT = tokenRepository.findTokenById(playerId).orElse(null);
         if (storedAT == null)
             return false;
-        return storedAT.equals(recievedAT);
+        return storedAT.equals(receivedAT);
     }
 }
