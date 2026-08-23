@@ -18,10 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -49,6 +46,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        System.err.println("Received message from " + session.getAttributes().get("id"));
         Player player = (Player) session.getAttributes().get("player");
         if (player == null) {
             handlePlayerLogin(session, message);
@@ -111,8 +109,10 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
             byte opcode = buffer.get();
             UUID token = ByteParser.parseUUID(buffer);
 
-            if (opcode != C2S_OP_AUTH || !authService.verifyAuthToken(playerId, token))
+            if (opcode != C2S_OP_AUTH || !authService.verifyAuthToken(playerId, token)) {
                 session.close();
+                return;
+            }
 
             Player player = factory.spawn(playerId);
             session.getAttributes().put("player", player);

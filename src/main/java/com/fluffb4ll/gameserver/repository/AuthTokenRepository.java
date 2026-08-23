@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface AuthTokenRepository extends JpaRepository<AuthTokenEntity, UUID> {
     Optional<AuthTokenEntity> findByToken(UUID token);
-    Optional<UUID> findTokenById(UUID id);
+    Optional<AuthTokenEntity> findTokenById(UUID id);
 }

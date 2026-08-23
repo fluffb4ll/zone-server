@@ -58,9 +58,9 @@ public class PlayerAuthService {
 
     @Transactional
     public boolean verifyAuthToken(UUID playerId, UUID receivedAT) {
-        UUID storedAT = tokenRepository.findTokenById(playerId).orElse(null);
+        AuthTokenEntity storedAT = tokenRepository.findTokenById(playerId).orElse(null);
         if (storedAT == null)
             return false;
-        return storedAT.equals(receivedAT);
+        return storedAT.getToken().equals(receivedAT);
     }
 }

@@ -35,10 +35,8 @@ public class AuthController {
     public ResponseEntity<AuthResponseDto> signup(@RequestBody AuthDto authDto) {
         try {
             UUID token = authService.signup(authDto.nickname(), authDto.password());
-            System.err.println(token);
             return ResponseEntity.ok(AuthResponseDto.signupOk(token));
         } catch (SecurityException e) {
-            System.err.println(e.getMessage());
             return ResponseEntity.badRequest().body(AuthResponseDto.error(e.getMessage()));
         }
     }
