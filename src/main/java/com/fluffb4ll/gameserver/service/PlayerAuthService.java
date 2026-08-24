@@ -1,8 +1,8 @@
 package com.fluffb4ll.gameserver.service;
 
-import com.fluffb4ll.gameserver.entity.AuthTokenEntity;
+import com.fluffb4ll.gameserver.entity.PlayerAuthEntity;
 import com.fluffb4ll.gameserver.entity.PlayerEntity;
-import com.fluffb4ll.gameserver.repository.AuthTokenRepository;
+import com.fluffb4ll.gameserver.repository.AuthRepository;
 import com.fluffb4ll.gameserver.repository.PlayerRepository;
 import com.fluffb4ll.gameserver.util.RegexValidator;
 import jakarta.transaction.Transactional;
@@ -15,27 +15,27 @@ import java.util.UUID;
 @Service
 public class PlayerAuthService {
     private final PlayerRepository playerRepository;
-    private final AuthTokenRepository tokenRepository;
+    private final AuthRepository authRepository;
     private final PasswordEncoder passEncoder;
 
     public PlayerAuthService(PlayerRepository playerRepository,
-                             AuthTokenRepository tokenRepository,
+                             AuthRepository authRepository,
                              PasswordEncoder passEncoder) {
         this.playerRepository = playerRepository;
-        this.tokenRepository = tokenRepository;
+        this.authRepository = authRepository;
         this.passEncoder = passEncoder;
     }
 
     @Transactional
     public List<UUID> login(String nickname, String rawPassword) throws SecurityException {
-        PlayerEntity player = playerRepository.findByNickname(nickname)
+        PlayerAuthEntity player = authRepository.findByNickname(nickname)
                 .orElseThrow(() -> new SecurityException("Wrong credentials"));
         if (!passEncoder.matches(rawPassword, player.getPassword()))
             throw new SecurityException("Wrong credentials");
 
         UUID token = UUID.randomUUID();
-        AuthTokenEntity authTokenEntity = new AuthTokenEntity(player.getId(), token);
-        tokenRepository.save(authTokenEntity);
+        player.setToken(token);
+        authRepository.save(player);
         return List.of(player.getId(), token);
     }
 
@@ -47,18 +47,19 @@ public class PlayerAuthService {
                     "digits and Latin letters");
         if (!RegexValidator.isValidNickname(nickname))
             throw new SecurityException("Invalid nickname");
-        if (playerRepository.findByNickname(nickname).isPresent())
+        if (authRepository.findByNickname(nickname).isPresent())
             throw new SecurityException("Player already exists");
 
         String encodedPassword = passEncoder.encode(rawPassword);
-        PlayerEntity player = new PlayerEntity(encodedPassword, nickname);
-        playerRepository.save(player);
+        PlayerAuthEntity player = new PlayerAuthEntity(encodedPassword, nickname);
+        authRepository.save(player);
+        playerRepository.save(new PlayerEntity(player.getId(), nickname));
         return player.getId();
     }
 
     @Transactional
     public boolean verifyAuthToken(UUID playerId, UUID receivedAT) {
-        AuthTokenEntity storedAT = tokenRepository.findTokenById(playerId).orElse(null);
+        PlayerAuthEntity storedAT = authRepository.findTokenById(playerId).orElse(null);
         if (storedAT == null)
             return false;
         return storedAT.getToken().equals(receivedAT);

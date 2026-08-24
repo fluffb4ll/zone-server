@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GameLoop {
     // TODO: парсить из конфига
     private static final int TICK_RATE = 20;
+    private static final int AUTOSAVE_INTERVAL = 300;
 
     private final WorldManager worldManager;
     private final WebSocketHandler wsHandler;
@@ -70,6 +71,9 @@ public class GameLoop {
 
             // отправка пакетов игрокам
             broadcastData();
+
+            if (tickCount % (TICK_RATE * AUTOSAVE_INTERVAL) == 0)
+                savePlayerData();
 
             if (shouldLogTick && submittedTasks == 0) {
                 System.out.println("[GameLoop]: Нет активных чанков для обработки (все в SLEEPING или карту не заселили).");
@@ -141,6 +145,10 @@ public class GameLoop {
         } catch (IOException _) {
             wsHandler.addDeadSession(player.getUuid());
         }
+    }
+
+    private void savePlayerData() {
+        // сохранение данных игроков
     }
 
     private boolean shouldTickChunk(MapChunk chunk) {

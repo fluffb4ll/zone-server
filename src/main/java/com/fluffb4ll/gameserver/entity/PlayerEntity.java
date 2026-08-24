@@ -17,9 +17,6 @@ public class PlayerEntity {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "password", length = 60, nullable = false)
-    private String password;
-
     @Column(name = "nickname", length = 16, nullable = false, unique = true)
     private String nickname;
 
@@ -44,7 +41,6 @@ public class PlayerEntity {
     public PlayerEntity() {}
 
     public PlayerEntity(UUID id,
-                        String password,
                         String nickname,
                         int maxHealth,
                         int currHealth,
@@ -53,7 +49,6 @@ public class PlayerEntity {
                         boolean hasPlayedBefore)
     {
         this.id = id;
-        this.password = password;
         this.nickname = nickname;
         this.maxHealth = maxHealth;
         this.currHealth = currHealth;
@@ -63,11 +58,9 @@ public class PlayerEntity {
         this.hasPlayedBefore = hasPlayedBefore;
     }
 
-    public PlayerEntity(String password,
-                        String nickname)
+    public PlayerEntity(UUID id, String nickname)
     {
-        id = IdGeneratorUtil.generateId();
-        this.password = password;
+        this.id = id;
         this.nickname = nickname;
     }
 
@@ -77,14 +70,6 @@ public class PlayerEntity {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getNickname() {
