@@ -133,7 +133,8 @@ public class MapChunk {
      */
     public void tick(long tickCount, boolean shouldLogStatus, float deltaTime, WorldManager worldManager) {
         if ((!anomalies.isEmpty() || !mutants.isEmpty()) && shouldLogStatus)
-            WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y), mutants.size(), anomalies.size());
+            WorldLogger.logChunkProcessing(String.format("%s %s", startPoint.x, startPoint.y),
+                    players.size(), mutants.size(), anomalies.size());
 
         tickAnomalies(deltaTime);
         tickMutants(deltaTime, worldManager);
@@ -154,8 +155,7 @@ public class MapChunk {
                 continue;
             mutant.updateAI(deltaTime);
             Vector2D newPos = mutant.calculateNextPosition(deltaTime);
-            // TODO: мутант должен двигаться сам
-            worldManager.moveEntity(mutant, this, newPos);
+            mutant.move(newPos);
         }
     }
 

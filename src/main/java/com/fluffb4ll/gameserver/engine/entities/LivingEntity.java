@@ -1,6 +1,7 @@
 package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
+import com.fluffb4ll.gameserver.model.records.events.EntityMoveEvent;
 import com.fluffb4ll.gameserver.util.MovementValidator;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.model.records.events.EntityDeathEvent;
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Defines a living entity, which can move and inflict and receive damage.
  */
 public abstract class LivingEntity extends BaseEntity {
-    private final byte opcode;
+    private final Byte opcode;
     private String displayName;
     private final AtomicInteger maxHealth;
     private final AtomicInteger health;
@@ -78,12 +79,14 @@ public abstract class LivingEntity extends BaseEntity {
         this.maxHealth.set(maxHealth);
     }
 
-    // TODO: переписать движение
+
     public synchronized boolean move(Vector2D newPos) {
-        if (!MovementValidator.isValidMove(getPosition(), newPos) || newPos == getPosition())
+        if (!MovementValidator.isValidMove(this, getPosition(), newPos) || newPos == getPosition())
             return false;
+        Vector2D oldPos = getPosition();
+        // TODO: переписать движение под вектор
         setPosition(newPos);
-        //WorldLogger.logEntityMove(getUuid(), newPos.x, newPos.y);
+        eventBus.publish(new EntityMoveEvent(this, oldPos, newPos));
         return true;
     }
 

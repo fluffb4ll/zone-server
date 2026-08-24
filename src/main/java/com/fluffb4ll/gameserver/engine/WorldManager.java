@@ -6,21 +6,20 @@ import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
 import com.fluffb4ll.gameserver.engine.terrains.SpawnerTerrain;
 import com.fluffb4ll.gameserver.engine.terrains.Terrain;
+import com.fluffb4ll.gameserver.model.records.events.EntityMoveEvent;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class WorldManager {
     private final Map<ChunkCoordinate, MapChunk> chunks = new ConcurrentHashMap<>();
     private final Map<UUID, Player> players = new ConcurrentHashMap<>();
+    private final EventBus eventBus;
 
     // TODO: вынести в отдельный конфиг
     // размер чанка в юнитах
@@ -29,6 +28,18 @@ public class WorldManager {
     // размеры мира в чанках
     private static final int WORLD_WIDTH_IN_CHUNKS = 10;
     private static final int WORLD_HEIGHT_IN_CHUNKS = 10;
+
+    // пределы мира
+    private static final float MIN_X = 0f;
+    private static final float MIN_Y = 0f;
+    private static final float MAX_X = WORLD_WIDTH_IN_CHUNKS * CHUNK_SIZE - 1f;
+    private static final float MAX_Y = WORLD_HEIGHT_IN_CHUNKS * CHUNK_SIZE - 1f;
+
+    public WorldManager(EventBus eventBus) {
+        this.eventBus = eventBus;
+
+        eventBus.subscribe(EntityMoveEvent.class, this::moveEntity);
+    }
 
     @PostConstruct
     public void initializeWorld() {
@@ -97,27 +108,26 @@ public class WorldManager {
     /**
      * Перемещает сущность из старого чанка в новый на основе её новых координат.
      * @param entity Сущность, которую нужно переместить
-     * @param currChunk Чанк, в котором находится сущность в данный момент
+     * @param oldPos Старая позиция сущности
      * @param newPos Новая позиция сущности
      */
-    public void moveEntity(LivingEntity entity, MapChunk currChunk, Vector2D newPos) {
-        // TODO: переписать под EventBus?
-        if (currChunk.contains(newPos) && entity.move(newPos))
+    public void moveEntity(EntityMoveEvent event) {
+        MapChunk oldChunk = getChunkByPosition(event.oldPos());
+        if (oldChunk.contains(event.newPos()))
             return;
 
-        MapChunk newChunk = getChunkByPosition(newPos);
+        LivingEntity entity = event.entity();
+
+        MapChunk newChunk = getChunkByPosition(event.newPos());
 
         if (newChunk == null) {
-            handleOutOfBoundsTravel(entity);
+            handleOutOfBoundsTravel(event.entity());
             return;
         }
 
-        if (!entity.move(newPos))
-            return;
-
-        removeEntityFromChunk(entity, currChunk);
+        removeEntityFromChunk(entity, oldChunk);
         addEntityToChunk(entity, newChunk);
-        WorldLogger.logChunkMigration(entity.getUuid(), currChunk, newChunk);
+        WorldLogger.logChunkMigration(entity.getUuid(), oldChunk, newChunk);
     }
 
     private void removeEntityFromChunk(BaseEntity entity, MapChunk chunk) {
@@ -139,8 +149,17 @@ public class WorldManager {
     }
 
     private void handleOutOfBoundsTravel(LivingEntity entity) {
-        // TODO: добавить обработку выхода за границы карты
         System.out.println("Сущность " + entity.getUuid() + " попыталась выйти за пределы карты!");
+
+        Vector2D pos = entity.getPosition();
+        if (pos.x >= MIN_X && pos.x <= MAX_X &&
+                pos.y >= MIN_Y && pos.y <= MAX_Y)
+            return;
+
+        pos.x = Math.clamp(pos.x, MIN_X, MAX_X);
+        pos.y = Math.clamp(pos.y, MIN_Y, MAX_Y);
+
+        entity.setPosition(pos);
     }
 
     // TODO: изменять лоды чанков в зависимости от близости игроков

@@ -73,6 +73,7 @@ public class Player extends LivingEntity {
 
     private void handleMoveCommand(WorldManager worldManager, MoveCommand command) {
         move(command.pos());
+        System.err.println(getUuid() + " moved! New pos: " + getPosition().x + " " + getPosition().y);
     }
 
     private void handleAttackCommand(WorldManager worldManager, AttackCommand command) {

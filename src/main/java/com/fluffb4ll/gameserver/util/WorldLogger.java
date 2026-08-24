@@ -12,10 +12,10 @@ public class WorldLogger {
     private static final String RED = "\u001B[31m";
     private static final String PURPLE = "\u001B[35m";
 
-    public static void logChunkProcessing(String chunkCoord, int mutantsCount, int anomaliesCount) {
+    public static void logChunkProcessing(String chunkCoord, int playerCount, int mutantsCount, int anomaliesCount) {
         String thread = Thread.currentThread().getName();
-        System.out.printf("%s[%s]%s Чанк %s -> Мутантов: %d, Аномалий: %d%n",
-                PURPLE, thread, RESET, chunkCoord, mutantsCount, anomaliesCount);
+        System.out.printf("%s[%s]%s Чанк %s -> Игроков: %d Мутантов: %d, Аномалий: %d%n",
+                PURPLE, thread, RESET, chunkCoord, playerCount, mutantsCount, anomaliesCount);
     }
 
     public static void logEntityMove(UUID entityId, float x, float y) {

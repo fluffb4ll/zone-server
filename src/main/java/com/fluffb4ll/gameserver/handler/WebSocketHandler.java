@@ -40,7 +40,6 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-        System.err.println("Received message from " + session.getAttributes().get("id"));
         Player player = (Player) session.getAttributes().get("player");
         if (player == null) {
             handlePlayerLogin(session, message);
@@ -81,6 +80,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
         if (player == null)
             return;
         UUID id = player.getUuid();
+        // TODO: сохранение данных игрока
         sessions.remove(id);
         worldManager.removePlayer(id);
     }
@@ -110,7 +110,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
             Player player = factory.spawn(playerId);
             session.getAttributes().put("player", player);
-        } catch (Exception _) {
+        } catch (Exception e) {
             addDeadSession(playerId);
         }
     }

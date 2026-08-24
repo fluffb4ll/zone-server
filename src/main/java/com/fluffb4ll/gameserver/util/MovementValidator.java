@@ -1,5 +1,7 @@
 package com.fluffb4ll.gameserver.util;
 
+import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
+
 public class MovementValidator {
 
     /**
@@ -9,7 +11,7 @@ public class MovementValidator {
      * @param newPos The desired new position of an entity.
      * @return true, if a move is valid; false otherwise.
      */
-    public static boolean isValidMove(Vector2D oldPos, Vector2D newPos) {
-        return true;
+    public static boolean isValidMove(LivingEntity entity, Vector2D oldPos, Vector2D newPos) {
+        return entity.isAlive();
     }
 }

@@ -25,7 +25,7 @@ public abstract class BaseEntity {
         return id;
     }
 
-    protected synchronized void setPosition(Vector2D position) {
+    public synchronized void setPosition(Vector2D position) {
         this.position = position.copy();
     }
 
