@@ -11,10 +11,6 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class PacketEncoder {
-    public static byte TYPE_PLAYER = 0x00;
-    public static byte TYPE_MUTANT = 0x01;
-    public static byte TYPE_ANOMALY = 0x02;
-
     /** <p>Создаёт индивидуальный снимок мира для отправки выбранному игроку.</p>
      * <p>Снимок содержит следующую информацию:<br>
      * 1. Опкод (1 байт)<br>
@@ -29,7 +25,7 @@ public class PacketEncoder {
         int packetSize = 1 + 8 + 4 + (visibleEntities.size() * 28);
         ByteBuffer buffer = ByteBuffer.allocate(packetSize);
 
-        buffer.put(WebSocketHandler.S2C_OP_WORLD_SNAPSHOT);
+        buffer.put(WebSocketHandler.OP_S2C_WORLD_SNAPSHOT);
         buffer.putLong(recipient.getLastProcessedPacketId());
         buffer.putInt(visibleEntities.size());
 
@@ -38,9 +34,9 @@ public class PacketEncoder {
             buffer.putLong(entity.getUuid().getLeastSignificantBits());
 
             switch (entity) {
-                case Player player -> buffer.put(TYPE_PLAYER);
-                case Mutant mutant -> buffer.put(TYPE_MUTANT);
-                case Anomaly anomaly -> buffer.put(TYPE_ANOMALY);
+                case Player player -> buffer.put(WebSocketHandler.OP_ENTITY_TYPE_PLAYER);
+                case Mutant mutant -> buffer.put(WebSocketHandler.OP_ENTITY_TYPE_MUTANT);
+                case Anomaly anomaly -> buffer.put(WebSocketHandler.OP_ENTITY_TYPE_ANOMALY);
                 default -> throw new IllegalArgumentException("Unknown entity type: " + entity.getClass().getName());
             }
 
@@ -62,7 +58,7 @@ public class PacketEncoder {
         int packetSize = 1 + 16;
         ByteBuffer buffer = ByteBuffer.allocate(packetSize);
 
-        buffer.put(WebSocketHandler.S2C_OP_ENTITY_DEATH);
+        buffer.put(WebSocketHandler.OP_S2C_ENTITY_DEATH);
         buffer.putLong(event.uuid().getMostSignificantBits());
         buffer.putLong(event.uuid().getLeastSignificantBits());
 
