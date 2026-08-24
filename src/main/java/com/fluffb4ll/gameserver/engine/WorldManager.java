@@ -1,7 +1,6 @@
 package com.fluffb4ll.gameserver.engine;
 
 import com.fluffb4ll.gameserver.engine.entities.*;
-import com.fluffb4ll.gameserver.handler.WebSocketHandler;
 import com.fluffb4ll.gameserver.model.enums.ChunkState;
 import com.fluffb4ll.gameserver.model.records.ChunkCoordinate;
 import com.fluffb4ll.gameserver.engine.terrains.SpawnerTerrain;
@@ -38,7 +37,7 @@ public class WorldManager {
     public WorldManager(EventBus eventBus) {
         this.eventBus = eventBus;
 
-        eventBus.subscribe(EntityMoveEvent.class, this::moveEntity);
+        eventBus.subscribe(EntityMoveEvent.class, this::moveEntityBetweenChunks);
     }
 
     @PostConstruct
@@ -106,12 +105,10 @@ public class WorldManager {
     }
 
     /**
-     * Перемещает сущность из старого чанка в новый на основе её новых координат.
-     * @param entity Сущность, которую нужно переместить
-     * @param oldPos Старая позиция сущности
-     * @param newPos Новая позиция сущности
+     * Обрабатывает перемещение сущности между чанками, если таковое случилось
+     * @param event Ивент движения сущности (см. {@link EntityMoveEvent})
      */
-    public void moveEntity(EntityMoveEvent event) {
+    public void moveEntityBetweenChunks(EntityMoveEvent event) {
         MapChunk oldChunk = getChunkByPosition(event.oldPos());
         if (oldChunk.contains(event.newPos()))
             return;

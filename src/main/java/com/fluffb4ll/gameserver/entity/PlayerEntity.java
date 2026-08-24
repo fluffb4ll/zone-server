@@ -1,5 +1,6 @@
 package com.fluffb4ll.gameserver.entity;
 
+import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.util.IdGeneratorUtil;
 import com.fluffb4ll.gameserver.util.Vector2D;
 import jakarta.persistence.Column;
@@ -16,7 +17,7 @@ public class PlayerEntity {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", length = 60, nullable = false)
     private String password;
 
     @Column(name = "nickname", length = 16, nullable = false, unique = true)
@@ -31,6 +32,9 @@ public class PlayerEntity {
     @Column(name = "curr_health")
     private int currHealth;
 
+    @Column(name = "speed")
+    private float speed;
+
     @Column(name = "pos_x")
     private float posX;
 
@@ -44,6 +48,7 @@ public class PlayerEntity {
                         String nickname,
                         int maxHealth,
                         int currHealth,
+                        float speed,
                         Vector2D pos,
                         boolean hasPlayedBefore)
     {
@@ -52,6 +57,7 @@ public class PlayerEntity {
         this.nickname = nickname;
         this.maxHealth = maxHealth;
         this.currHealth = currHealth;
+        this.speed = speed;
         posX = pos.x;
         posY = pos.y;
         this.hasPlayedBefore = hasPlayedBefore;
@@ -120,5 +126,15 @@ public class PlayerEntity {
 
     public void setHasPlayedBefore(boolean hasPlayedBefore) {
         this.hasPlayedBefore = hasPlayedBefore;
+    }
+
+    public void copyPlayerData(Player player) {
+        nickname = player.getDisplayName();
+        maxHealth = player.getMaxHealth();
+        currHealth = player.getHealth();
+        speed = player.getSpeed();
+        Vector2D currPos = player.getPosition();
+        posX = currPos.x;
+        posY = currPos.y;
     }
 }

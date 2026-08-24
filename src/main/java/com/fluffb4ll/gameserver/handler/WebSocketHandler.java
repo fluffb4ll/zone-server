@@ -3,9 +3,11 @@ package com.fluffb4ll.gameserver.handler;
 import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.engine.factories.PlayerFactory;
+import com.fluffb4ll.gameserver.entity.PlayerEntity;
 import com.fluffb4ll.gameserver.model.PacketOpcodes;
 import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
 import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
+import com.fluffb4ll.gameserver.repository.PlayerRepository;
 import com.fluffb4ll.gameserver.service.PlayerAuthService;
 import com.fluffb4ll.gameserver.util.ByteParser;
 import com.fluffb4ll.gameserver.util.Vector2D;
@@ -29,13 +31,14 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     private final WorldManager worldManager;
     private final PlayerAuthService authService;
     private final PlayerFactory factory;
+    private final PlayerRepository playerRepository;
 
 
-
-    public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory) {
+    public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory, PlayerRepository playerRepository) {
         this.worldManager = worldManager;
         this.authService = authService;
         this.factory = factory;
+        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -80,7 +83,13 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
         if (player == null)
             return;
         UUID id = player.getUuid();
-        // TODO: сохранение данных игрока
+
+        PlayerEntity playerData = playerRepository.findById(id).orElse(null);
+        if (playerData != null) {
+            playerData.copyPlayerData(player);
+            playerRepository.save(playerData);
+        }
+
         sessions.remove(id);
         worldManager.removePlayer(id);
     }
@@ -110,7 +119,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
 
             Player player = factory.spawn(playerId);
             session.getAttributes().put("player", player);
-        } catch (Exception e) {
+        } catch (Exception _) {
             addDeadSession(playerId);
         }
     }
