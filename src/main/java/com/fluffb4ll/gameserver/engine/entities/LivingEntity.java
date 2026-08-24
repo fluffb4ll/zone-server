@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Defines a living entity, which can move and inflict and receive damage.
  */
 public abstract class LivingEntity extends BaseEntity {
+    private final byte opcode;
     private String displayName;
     private final AtomicInteger maxHealth;
     private final AtomicInteger health;
@@ -20,9 +21,10 @@ public abstract class LivingEntity extends BaseEntity {
     private final AtomicFloat speed;
     private final EventBus eventBus;
 
-    public LivingEntity(UUID id, Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
+    public LivingEntity(Byte opcode, UUID id, Vector2D position, String displayName, int maxHealth, int damage, float speed, EventBus eventBus) {
         super(id, position);
 
+        this.opcode = opcode;
         this.displayName = displayName;
         health = new AtomicInteger(maxHealth);
         this.maxHealth = new AtomicInteger(maxHealth);
@@ -98,5 +100,9 @@ public abstract class LivingEntity extends BaseEntity {
         int maxHealth = this.maxHealth.get();
         if (hp > maxHealth)
             health.set(maxHealth);
+    }
+
+    public byte getOpcode() {
+        return opcode;
     }
 }

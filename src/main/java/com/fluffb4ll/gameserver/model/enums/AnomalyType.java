@@ -1,15 +1,18 @@
 package com.fluffb4ll.gameserver.model.enums;
 
+import com.fluffb4ll.gameserver.model.PacketOpcodes;
+
 public enum AnomalyType {
-    ZHARKA("Zharka", 9999, 0f, 10,
+    ZHARKA(PacketOpcodes.OP_ANOMALY_TYPE_ZHARKA, "Zharka", 9999, 0f, 10,
             AnomalyElementalType.THERMAL, 5.0f, 0.5f,0f),
-    ELECTRO("Electro", 9999, 0f, 20,
+    ELECTRO(PacketOpcodes.OP_ANOMALY_TYPE_ELECTRO, "Electro", 9999, 0f, 20,
             AnomalyElementalType.ELECTRICAL, 8.0f, 2f, 0f),
-    GAS_CLOUD("Gas Cloud", 9999, 0f, 15,
+    GAS_CLOUD(PacketOpcodes.OP_ANOMALY_TYPE_GAS_CLOUD, "Gas Cloud", 9999, 0f, 15,
             AnomalyElementalType.CHEMICAL, 4.0f, 0f, 0f),
-    VORTEX("Vortex", 9999, 0f, 50,
+    VORTEX(PacketOpcodes.OP_ANOMALY_TYPE_VORTEX, "Vortex", 9999, 0f, 50,
             AnomalyElementalType.GRAVITATIONAL, 5.0f, 3f, 1f);
 
+    private final byte opcode;
     private final String displayName;
     private final int maxHealth;
     private final float speed;
@@ -19,7 +22,8 @@ public enum AnomalyType {
     private final float cooldownTime;
     private final float chargeTime;
 
-    AnomalyType(String displayName,
+    AnomalyType(byte opcode,
+                String displayName,
                 int maxHealth,
                 float speed,
                 int baseDamage,
@@ -27,6 +31,7 @@ public enum AnomalyType {
                 float radius,
                 float cooldownTime,
                 float chargeTime) {
+        this.opcode = opcode;
         this.displayName = displayName;
         this.maxHealth = maxHealth;
         this.speed = speed;
@@ -68,5 +73,9 @@ public enum AnomalyType {
 
     public float getChargeTime() {
         return chargeTime;
+    }
+
+    public byte getOpcode() {
+        return opcode;
     }
 }

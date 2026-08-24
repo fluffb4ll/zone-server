@@ -25,7 +25,8 @@ public class Anomaly extends LivingEntity {
     private final float cooldownTime;
     private final float chargeTime;
 
-    public Anomaly(UUID id,
+    public Anomaly(byte opcode,
+                   UUID id,
                    Vector2D position,
                    String displayName,
                    int maxHealth,
@@ -36,7 +37,7 @@ public class Anomaly extends LivingEntity {
                    float radius,
                    float cooldownTime,
                    float chargeTime) {
-        super(id, position, displayName, maxHealth, damage, speed, eventBus);
+        super(opcode, id, position, displayName, maxHealth, damage, speed, eventBus);
 
         this.type = type;
         this.radius = new AtomicFloat(radius);

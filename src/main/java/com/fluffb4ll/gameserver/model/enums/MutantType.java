@@ -1,13 +1,16 @@
 package com.fluffb4ll.gameserver.model.enums;
 
+import com.fluffb4ll.gameserver.model.PacketOpcodes;
+
 public enum MutantType {
-    BLIND_DOG("Blind Dog", 100, 12.0f, 15,
+    BLIND_DOG(PacketOpcodes.OP_MUTANT_TYPE_BLIND_DOG, "Blind Dog", 100, 12.0f, 15,
             MutantBehaviour.COWARD, 10f, 3f),
-    FLESH("Flesh", 150, 8.0f, 10,
+    FLESH(PacketOpcodes.OP_MUTANT_TYPE_FLESH, "Flesh", 150, 8.0f, 10,
             MutantBehaviour.NEUTRAL, 20f, 5f),
-    BLOODSUCKER("Bloodsucker", 250, 18.0f,
+    BLOODSUCKER(PacketOpcodes.OP_MUTANT_TYPE_BLOODSUCKER, "Bloodsucker", 250, 18.0f,
             45, MutantBehaviour.AGGRESSIVE, 50f, 15f);
 
+    private final byte opcode;
     private final String displayName;
     private final int maxHealth;
     private final float speed;
@@ -16,8 +19,9 @@ public enum MutantType {
     private final float wanderRadius;
     private final float spawnCooldown;
 
-    MutantType(String displayName, int maxHealth, float speed,
+    MutantType(byte opcode, String displayName, int maxHealth, float speed,
                int baseDamage, MutantBehaviour behaviour, float wanderRadius, float spawnCooldown) {
+        this.opcode = opcode;
         this.displayName = displayName;
         this.maxHealth = maxHealth;
         this.speed = speed;
@@ -53,5 +57,9 @@ public enum MutantType {
 
     public float getSpawnCooldown() {
         return spawnCooldown;
+    }
+
+    public byte getOpcode() {
+        return opcode;
     }
 }

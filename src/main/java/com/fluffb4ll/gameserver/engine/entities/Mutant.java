@@ -24,7 +24,8 @@ public class Mutant extends LivingEntity {
 
     private float timer = 0f;
 
-    public Mutant(UUID id,
+    public Mutant(byte opcode,
+                  UUID id,
                   Vector2D position,
                   String displayName,
                   int maxHealth,
@@ -34,7 +35,7 @@ public class Mutant extends LivingEntity {
                   MutantBehaviour behaviour,
                   MutantNest home,
                   float wanderRadius) {
-        super(id, position, displayName, maxHealth, damage, speed, eventBus);
+        super(opcode, id, position, displayName, maxHealth, damage, speed, eventBus);
 
         this.behaviour = behaviour;
         this.home = home;

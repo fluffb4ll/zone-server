@@ -20,6 +20,7 @@ public class MutantFactory extends EntityFactory {
     public Mutant create(MutantType type, MutantNest nest, Vector2D pos) {
         UUID id = IdGeneratorUtil.generateId();
         return new Mutant(
+                type.getOpcode(),
                 id,
                 pos,
                 type.getDisplayName(),
@@ -41,6 +42,7 @@ public class MutantFactory extends EntityFactory {
 
     public Mutant create(UUID id, MutantType type, MutantNest nest, Vector2D pos) {
         return new Mutant(
+                type.getOpcode(),
                 id,
                 pos,
                 type.getDisplayName(),

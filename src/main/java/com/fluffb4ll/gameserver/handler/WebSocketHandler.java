@@ -3,6 +3,7 @@ package com.fluffb4ll.gameserver.handler;
 import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.engine.entities.Player;
 import com.fluffb4ll.gameserver.engine.factories.PlayerFactory;
+import com.fluffb4ll.gameserver.model.PacketOpcodes;
 import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
 import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
 import com.fluffb4ll.gameserver.service.PlayerAuthService;
@@ -29,19 +30,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
     private final PlayerAuthService authService;
     private final PlayerFactory factory;
 
-    // опкоды client-to-server пакетов
-    private final byte OP_C2S_AUTH = 0x00;
-    private final byte OP_C2S_MOVE = 0x01;
-    private final byte OP_C2S_ATTACK = 0x02;
 
-    // опкоды server-to-client пакетов
-    public static final byte OP_S2C_WORLD_SNAPSHOT = 0x10;
-    public static final byte OP_S2C_ENTITY_DEATH = 0x11;
-
-    // опкоды типов сущностей
-    public static final byte OP_ENTITY_TYPE_PLAYER = 0x00;
-    public static final byte OP_ENTITY_TYPE_MUTANT = 0x01;
-    public static final byte OP_ENTITY_TYPE_ANOMALY = 0x02;
 
     public WebSocketHandler(WorldManager worldManager, PlayerAuthService authService, PlayerFactory factory) {
         this.worldManager = worldManager;
@@ -65,8 +54,8 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
         byte opcode = buffer.get();
 
         switch (opcode) {
-            case OP_C2S_MOVE -> handleMovePacket(player, buffer);
-            case OP_C2S_ATTACK -> handleAttackPacket(player, buffer);
+            case PacketOpcodes.OP_C2S_MOVE -> handleMovePacket(player, buffer);
+            case PacketOpcodes.OP_C2S_ATTACK -> handleAttackPacket(player, buffer);
             default -> System.err.println("Unknown opcode: " + opcode);
         }
     }
@@ -114,7 +103,7 @@ public class WebSocketHandler extends BinaryWebSocketHandler {
             byte opcode = buffer.get();
             UUID token = ByteParser.parseUUID(buffer);
 
-            if (opcode != OP_C2S_AUTH || !authService.verifyAuthToken(playerId, token)) {
+            if (opcode != PacketOpcodes.OP_C2S_AUTH || !authService.verifyAuthToken(playerId, token)) {
                 session.close();
                 return;
             }

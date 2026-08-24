@@ -19,6 +19,7 @@ public class AnomalyFactory extends EntityFactory {
     public Anomaly create(AnomalyType type, Vector2D pos) {
         UUID id = IdGeneratorUtil.generateId();
         return new Anomaly(
+                type.getOpcode(),
                 id,
                 pos,
                 type.getDisplayName(),
@@ -41,6 +42,7 @@ public class AnomalyFactory extends EntityFactory {
 
     public Anomaly create(UUID id, AnomalyType type, Vector2D pos) {
         return new Anomaly(
+                type.getOpcode(),
                 id,
                 pos,
                 type.getDisplayName(),

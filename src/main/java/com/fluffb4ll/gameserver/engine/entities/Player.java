@@ -1,15 +1,12 @@
 package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
-import com.fluffb4ll.gameserver.engine.MapChunk;
 import com.fluffb4ll.gameserver.engine.WorldManager;
 import com.fluffb4ll.gameserver.model.records.commands.PlayerCommand;
 import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
 import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
 import com.fluffb4ll.gameserver.util.Vector2D;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -22,7 +19,6 @@ public class Player extends LivingEntity {
     private final AtomicLong lastProcessedPacketId = new AtomicLong(0);
     private final Queue<PlayerCommand> inboundQueue = new ConcurrentLinkedQueue<>();
     private final Queue<byte[]> outboundEventsQueue = new ConcurrentLinkedQueue<>();
-    private final List<MapChunk> listenedChunks = new ArrayList<>();
 
     public Player(UUID id,
                   Vector2D position,
@@ -31,7 +27,7 @@ public class Player extends LivingEntity {
                   int damage,
                   float speed,
                   EventBus eventBus) {
-        super(id, position, displayName, maxHealth, damage, speed, eventBus);
+        super(null, id, position, displayName, maxHealth, damage, speed, eventBus);
     }
 
     public Player(UUID id,
@@ -42,7 +38,7 @@ public class Player extends LivingEntity {
                   int damage,
                   float speed,
                   EventBus eventBus) {
-        super(id, position, displayName, maxHealth, damage, speed, eventBus);
+        super(null, id, position, displayName, maxHealth, damage, speed, eventBus);
 
         setHealth(currHealth);
     }
