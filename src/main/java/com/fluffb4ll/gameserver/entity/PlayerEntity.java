@@ -45,8 +45,7 @@ public class PlayerEntity {
                         int maxHealth,
                         int currHealth,
                         float speed,
-                        Vector2D pos,
-                        boolean hasPlayedBefore)
+                        Vector2D pos)
     {
         this.id = id;
         this.nickname = nickname;
@@ -55,7 +54,7 @@ public class PlayerEntity {
         this.speed = speed;
         posX = pos.x;
         posY = pos.y;
-        this.hasPlayedBefore = hasPlayedBefore;
+        hasPlayedBefore = true;
     }
 
     public PlayerEntity(UUID id, String nickname)

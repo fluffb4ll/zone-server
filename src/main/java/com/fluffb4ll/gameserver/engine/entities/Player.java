@@ -2,6 +2,7 @@ package com.fluffb4ll.gameserver.engine.entities;
 
 import com.fluffb4ll.gameserver.engine.EventBus;
 import com.fluffb4ll.gameserver.engine.WorldManager;
+import com.fluffb4ll.gameserver.entity.PlayerEntity;
 import com.fluffb4ll.gameserver.model.records.commands.PlayerCommand;
 import com.fluffb4ll.gameserver.model.records.commands.AttackCommand;
 import com.fluffb4ll.gameserver.model.records.commands.MoveCommand;
@@ -88,5 +89,15 @@ public class Player extends LivingEntity {
 
     public void addToOutboundQueue(byte[] packet) {
         outboundEventsQueue.add(packet);
+    }
+
+    public PlayerEntity mapToPlayerEntity() {
+        return new PlayerEntity(
+                getUuid(),
+                getDisplayName(),
+                getMaxHealth(),
+                getHealth(),
+                getSpeed(),
+                getPosition());
     }
 }

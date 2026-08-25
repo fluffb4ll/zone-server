@@ -2,7 +2,9 @@ package com.fluffb4ll.gameserver.engine;
 
 import com.fluffb4ll.gameserver.engine.entities.LivingEntity;
 import com.fluffb4ll.gameserver.engine.entities.Player;
+import com.fluffb4ll.gameserver.entity.PlayerEntity;
 import com.fluffb4ll.gameserver.handler.WebSocketHandler;
+import com.fluffb4ll.gameserver.service.PlayerSaveService;
 import com.fluffb4ll.gameserver.util.PacketEncoder;
 import com.fluffb4ll.gameserver.util.WorldLogger;
 import jakarta.annotation.PreDestroy;
@@ -24,6 +26,7 @@ public class GameLoop {
 
     private final WorldManager worldManager;
     private final WebSocketHandler wsHandler;
+    private final PlayerSaveService saveService;
 
     // ритм сервера
     private final ScheduledExecutorService heartbeat = Executors.newSingleThreadScheduledExecutor();
@@ -42,9 +45,10 @@ public class GameLoop {
 
     private long tickCount = 0;
 
-    public GameLoop(WorldManager worldManager, WebSocketHandler wsHandler) {
+    public GameLoop(WorldManager worldManager, WebSocketHandler wsHandler, PlayerSaveService saveService) {
         this.worldManager = worldManager;
         this.wsHandler = wsHandler;
+        this.saveService = saveService;
     }
 
     public void start() {
@@ -148,7 +152,10 @@ public class GameLoop {
     }
 
     private void savePlayerData() {
-        // сохранение данных игроков
+        List<PlayerEntity> playerData = worldManager.getPlayers().stream()
+                .map(Player::mapToPlayerEntity).toList();
+
+        saveService.savePlayerDataAsync(playerData);
     }
 
     private boolean shouldTickChunk(MapChunk chunk) {

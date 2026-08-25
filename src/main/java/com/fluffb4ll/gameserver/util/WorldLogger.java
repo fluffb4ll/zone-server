@@ -4,6 +4,7 @@ import com.fluffb4ll.gameserver.engine.MapChunk;
 
 import java.util.UUID;
 
+// TODO: сделать обёрткой вокруг slf4j + logback
 public class WorldLogger {
 
     private static final String RESET = "\u001B[0m";
@@ -47,5 +48,17 @@ public class WorldLogger {
         String thread = Thread.currentThread().getName();
         System.out.printf("%s[%s]%s Тик №%s%n",
                 PURPLE, thread, RESET, tickCount);
+    }
+
+    public static void logException(String message, Exception e) {
+        String thread = Thread.currentThread().getName();
+        System.out.printf("%s[%s]%s %s: %s%n",
+                RED, thread, RESET, message, e);
+    }
+
+    public static void logError(String message) {
+        String thread = Thread.currentThread().getName();
+        System.out.printf("%s[%s]%s %s%n",
+                RED, thread, RESET, message);
     }
 }
